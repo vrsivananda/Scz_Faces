@@ -184,6 +184,9 @@
           }//End of loop_function
         };//End of loop Node
         
+        //Debrief block
+        var debriefBlock = makeDebriefBlock();
+        
         //Timeline array to be fed into the jsPsych.init function
         var timeline = [];
         
@@ -193,6 +196,7 @@
         timeline.push(prepForPhase2);
         timeline.push(instructionsBlock2);
         timeline.push(loopNode);
+        timeline.push(debriefBlock);
         
         
         //==================================
