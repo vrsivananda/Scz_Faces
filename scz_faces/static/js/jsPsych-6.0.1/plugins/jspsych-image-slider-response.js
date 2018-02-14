@@ -94,21 +94,24 @@ jsPsych.plugins['image-slider-response'] = (function() {
     
     //[sivaHack]
     //Get the width of the window
-    var width = window.innerWidth;
+    var windowWidth = window.innerWidth;
     
     //Calculate the image width
-    var imageWidth = width/4;
+    var imageWidth = windowWidth/4;
     
     //Constraint the width
     if(imageWidth > 450){
       imageWidth = 450;
     }
     
+    //Width of the slider
+    var sliderWidth = windowWidth/2;
+    
 
-    var html = '<div id="jspsych-image-slider-response-wrapper" style="margin: 100px 0px;">';
+    var html = '<div id="jspsych-image-slider-response-wrapper" style="margin: 50px 0px;">';
     html += '<div id="jspsych-image-slider-response-stimulus"><img src="' + trial.stimulus + `" style="width: ${imageWidth}px; height: auto"></div>`;//[sivaHack]
     html += '<div class="jspsych-image-slider-response-container" style="position:relative;">';
-    html += '<input type="range" value="'+trial.start+'" min="'+trial.min+'" max="'+trial.max+'" step="'+trial.step+'" style="width: 100%;" id="jspsych-image-slider-response-response"></input>';
+    html += '<input type="range" value="'+trial.start+'" min="'+trial.min+'" max="'+trial.max+'" step="'+trial.step+`" style="width: ${sliderWidth}px;" id="jspsych-image-slider-response-response"></input>`;
     html += '<div>'
     for(var j=0; j < trial.labels.length; j++){
       var width = 100/(trial.labels.length-1);
@@ -126,7 +129,7 @@ jsPsych.plugins['image-slider-response'] = (function() {
     }
 
     // add submit button
-    html += '<button id="jspsych-image-slider-response-next" class="jspsych-btn">'+trial.button_label+'</button>';
+    html += `<button id="jspsych-image-slider-response-next" class="jspsych-btn" style="width: ${sliderWidth}px; height:70px;">`+trial.button_label+'</button>';
 
     display_element.innerHTML = html;
 
@@ -142,7 +145,11 @@ jsPsych.plugins['image-slider-response'] = (function() {
       response.response = display_element.querySelector('#jspsych-image-slider-response-response').value;
 
       if(trial.response_ends_trial){
-        end_trial();
+        //Only end the trial if the position is not in the intial position
+        if(Number(response.response) !== trial.start){ //[sivaHack]
+          end_trial();
+        }
+        
       } else {
         display_element.querySelector('#jspsych-image-slider-response-next').disabled = true;
       }

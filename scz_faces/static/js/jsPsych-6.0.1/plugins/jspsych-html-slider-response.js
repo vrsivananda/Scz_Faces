@@ -89,11 +89,20 @@ jsPsych.plugins['html-slider-response'] = (function() {
   }
 
   plugin.trial = function(display_element, trial) {
-
-    var html = '<div id="jspsych-html-slider-response-wrapper" style="margin: 100px 0px;">';
+    
+    
+    //[sivaHack]
+    //Get the width of the window
+    var windowWidth = window.innerWidth;
+    
+    //Width of the slider
+    var sliderWidth = windowWidth/2;
+    
+    
+    var html = '<div id="jspsych-html-slider-response-wrapper" style="margin: 50px 0px;">';
     html += '<div id="jspsych-html-slider-response-stimulus">' + trial.stimulus + '</div>';
     html += '<div class="jspsych-html-slider-response-container" style="position:relative;">';
-    html += '<input type="range" value="'+trial.start+'" min="'+trial.min+'" max="'+trial.max+'" step="'+trial.step+'" style="width: 100%;" id="jspsych-html-slider-response-response"></input>';
+    html += '<input type="range" value="'+trial.start+'" min="'+trial.min+'" max="'+trial.max+'" step="'+trial.step+`" style="width: ${sliderWidth}px;" id="jspsych-html-slider-response-response"></input>`;
     html += '<div>'
     for(var j=0; j < trial.labels.length; j++){
       var width = 100/(trial.labels.length-1);
@@ -111,7 +120,7 @@ jsPsych.plugins['html-slider-response'] = (function() {
     }
 
     // add submit button
-    html += '<button id="jspsych-html-slider-response-next" class="jspsych-btn">'+trial.button_label+'</button>';
+    html += `<button id="jspsych-html-slider-response-next" class="jspsych-btn" style="width: ${sliderWidth}px; height:70px;">`+trial.button_label+'</button>';
 
     display_element.innerHTML = html;
 
@@ -127,7 +136,10 @@ jsPsych.plugins['html-slider-response'] = (function() {
       response.response = display_element.querySelector('#jspsych-html-slider-response-response').value;
 
       if(trial.response_ends_trial){
-        end_trial();
+        //Only end the trial if the position is not in the intial position
+        if(Number(response.response) !== trial.start){ //[sivaHack]
+          end_trial();
+        }
       } else {
         display_element.querySelector('#jspsych-html-slider-response-next').disabled = true;
       }

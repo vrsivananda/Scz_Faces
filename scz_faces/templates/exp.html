@@ -54,7 +54,6 @@
         }
         
         
-        
         ///////////////////////////////////////////////////////////////
         //-----------------Your code below this line-----------------//
         
@@ -71,6 +70,12 @@
         var highPEFemaleArray = []; //Array to hold the high PE Female Face Objects
         var lowPEMaleArray = [];    //Array to hold the low  PE Male   Face Objects
         var lowPEFemaleArray = [];  //Array to hold the low  PE Female Face Objects
+        
+        //Variable to keep track of whether the subject completed all phases
+        var allPhasesCompleted = false; //Set to true in on_finish of debrief block
+        
+        //Variable to keep track of whether the subject answered all the phase1 questions below 1s
+        var subjectAnsweredAllPhase1Below1Second = true; //Changed in the on_finish function of the phase 1 questions
         
         //The array of male stimuli
         var female_stimuli = [
@@ -255,7 +260,8 @@
             "This is to ensure that the images are displayed in the correct size.";
             
           //Page 4 instructions
-          var page4 = "This is the end of the instructions. <br/>" + 
+          var page4 = "Please also note that you will have to move the slider from its initial position to continue. <br/><br/>" +
+            "This is the end of the instructions. <br/>" + 
             "Please click 'next' to start the experiment.";
             
           //Load it into a trial object and return it
@@ -281,19 +287,19 @@
             
           //Page 2 instructions
           var page2 = "Your task in phase 2 is to <b>compare the attractiveness</b> of the faces that are presented. <br/>" + 
-            "There will either be two or three faces being presented, and you will <b>click on the most attractive face.</b> <br/>";
+            "There will be either two or three faces being presented, and you will <b>click on the most attractive face.</b> <br/>";
             
           //Page 3 instructions
           var page3 = "Once you have chosen the most attractive face, a slider will be presented.<br/>" + 
             "<b>Slide the slider based on how confident you are about your choice.</b><br/>" + 
             "If you are CERTAIN that you picked the most attractive face, then slide it all the way to the right.<br/>" + 
-            "If you are uncertain, then slide it a little to the right based on how uncertain you are.<br/>" +
+            "If you are uncertain, then slide it a little to the right based on how uncertain you are.<br/><br/>" +
             "<i>Make sure to use the full length of the slider to indicate your confidence.</i>";
             
           //Page 4 instructions
           var page4 = "Remember to:<br/>" +
             "(1) Click on the most attractive face, and <br/>" +
-            "(2) Slide the slider to indicate how confident you are.<br/><br/>" + 
+            "(2) Slide the slider to indicate how confident you are that the face you chose was the most attractive out of all faces presented.<br/><br/>" + 
             "This is the end of the instructions for phase 2.<br/>" + 
             "Please click 'next' to start the experiment.";
             
@@ -361,7 +367,12 @@
                   }//End of inner if
                 }//End of outer if
               }//End of for loop
-              console.log(JSON.parse(JSON.stringify(relevantArray)));
+              
+              //If the subject took longer than 1 second to answer, then set the flag to false
+              if(data.rt > 1000){
+                subjectAnsweredAllPhase1Below1Second = false;
+              }
+              
             }//End of on_finish
           };//End of simObject
           
@@ -413,7 +424,7 @@
           return {
             type: 'image-slider-response',
             timeline: phase1Array
-          };
+          };//End of return
         }//End of makePhase1
         
         //Function that makes the necessary processing for the previous data for phase 2
@@ -448,6 +459,9 @@
                 console.log(JSON.parse(JSON.stringify(relevantArray)));
               
               }//End of for loop
+              
+              //Make the PE Arrays and check if the distribution of z-scores are good enough to make the trials
+              makeAndCheckPEArrays(); //If it is not good enough, this will short-circuit the timeline and end the experiment
               
               //Make the 2AFC Trials, which is stored in the global variable AFC2Array
               make2AFCTrials();
@@ -542,12 +556,8 @@
           
         }//End of calculateRankings
         
-        //Function to make the 2AFC trials, returns an array of individual trials
-        function make2AFCTrials(){
-          console.log("started making 2AFC trials.");
-         
-          //The array to hold all the 2AFC trials
-          AFC2Array = []; //Global variable
+        //Function to check if there is a good distribution of z-scores. If there isn't this will short-circuit the timeline and end the experiment
+        function makeAndCheckPEArrays(){
           
           //Make an array of HighPE or LowPE Face Objects (i.e. faces with z-score > 0 or < 0)
           highPEMaleArray = makePEArray(male_stimuli,"high"); //Global variable
@@ -564,15 +574,36 @@
           console.log("lowPEFemaleArray:");
           console.log(lowPEFemaleArray);
           
+                    
+          //If any of the four arrays have less than 3 elements or if the subject answered all phase 1 questions below 1 second, then we kill the experiment
+          if( highPEMaleArray.length   < 3 ||
+              highPEFemaleArray.length < 3 ||
+              lowPEMaleArray.length    < 3 ||
+              lowPEFemaleArray.length  < 3 ||
+              subjectAnsweredAllPhase1Below1Second){
+           
+           //Kill the experiment
+           jsPsych.endExperiment("Thank you for participating! <br/> Your responses in phase 1 make you ineligible to complete phase 2. <br/> Please email <b>uclaqualialab@gmail.com</b> with your WorkerID to receive partial compensation.");
+            
+          }//End of if
+          
+        }//End of checkPEArrays
+        
+        //Function to make the 2AFC trials, returns an array of individual trials
+        function make2AFCTrials(){
+          console.log("started making 2AFC trials.");
+         
+          //The array to hold all the 2AFC trials
+          AFC2Array = []; //Global variable
           
           //Loop that makes the trials
           for (var i = 0; i < nTrials2AFC/4; i++){
             
             //Randomly choose two faces from the high PE array for each gender
-            var highPEMalePair = jsPsych.randomization.sampleWithoutReplacement(highPEMaleArray,2);
-            var highPEFemalePair = jsPsych.randomization.sampleWithoutReplacement(highPEFemaleArray,2);
-            var lowPEMalePair = jsPsych.randomization.sampleWithoutReplacement(lowPEMaleArray,2);
-            var lowPEFemalePair = jsPsych.randomization.sampleWithoutReplacement(lowPEFemaleArray,2);
+            var highPEMalePair = sampleFrom(highPEMaleArray,2);
+            var highPEFemalePair = sampleFrom(highPEFemaleArray,2);
+            var lowPEMalePair = sampleFrom(lowPEMaleArray,2);
+            var lowPEFemalePair = sampleFrom(lowPEFemaleArray,2);
             
             //Make trial from the pair
             var highPEMaleTrial = makeTrialFromPair(highPEMalePair);
@@ -608,28 +639,28 @@
             
             //--High PE && High Norm--
             //Select all three from z-score > 0 (i.e. highPE Array)
-            var highPEMaleHighNormTriplet = jsPsych.randomization.sampleWithoutReplacement(highPEMaleArray,3);
-            var highPEFemaleHighNormTriplet = jsPsych.randomization.sampleWithoutReplacement(highPEFemaleArray,3);
+            var highPEMaleHighNormTriplet = sampleFrom(highPEMaleArray,3);
+            var highPEFemaleHighNormTriplet = sampleFrom(highPEFemaleArray,3);
             
             //--Low PE && High Norm--
             //Select all three from z-score < 0 (i.e. lowPE Array)
             //High or Low Norm will be determined during analysis. Variable names here are merely filler and for counterbalancing
-            var lowPEMaleHighNormTriplet = jsPsych.randomization.sampleWithoutReplacement(lowPEMaleArray,3);
-            var lowPEFemaleHighNormTriplet = jsPsych.randomization.sampleWithoutReplacement(lowPEFemaleArray,3);
+            var lowPEMaleHighNormTriplet = sampleFrom(lowPEMaleArray,3);
+            var lowPEFemaleHighNormTriplet = sampleFrom(lowPEFemaleArray,3);
             
             
             //---- Low Norm ----
             
             //--High PE && Low Norm--
             //Select two from z-score > 0 and one from z-score < 0
-            var highPEMaleLowNormTriplet = jsPsych.randomization.sampleWithoutReplacement(highPEMaleArray,2).concat(jsPsych.randomization.sampleWithoutReplacement(lowPEMaleArray,1));
-            var highPEFemaleLowNormTriplet = jsPsych.randomization.sampleWithoutReplacement(highPEFemaleArray,2).concat(jsPsych.randomization.sampleWithoutReplacement(lowPEFemaleArray,1));
+            var highPEMaleLowNormTriplet = sampleFrom(highPEMaleArray,2).concat(sampleFrom(lowPEMaleArray,1));
+            var highPEFemaleLowNormTriplet = sampleFrom(highPEFemaleArray,2).concat(sampleFrom(lowPEFemaleArray,1));
             
             //--Low PE && Low Norm--
             //Select all three from z-score < 0 (i.e. lowPE Array)
             //High or Low Norm will be determined during analysis. Variable names here are merely filler and for counterbalancing
-            var lowPEMaleHighLowTriplet = jsPsych.randomization.sampleWithoutReplacement(lowPEMaleArray,3);
-            var lowPEFemaleLowNormTriplet = jsPsych.randomization.sampleWithoutReplacement(lowPEFemaleArray,3);
+            var lowPEMaleHighLowTriplet = sampleFrom(lowPEMaleArray,3);
+            var lowPEFemaleLowNormTriplet = sampleFrom(lowPEFemaleArray,3);
             
             
             //=======  Make the triplet trials  =======
@@ -661,6 +692,63 @@
           console.log(AFC3Array);
           
         }//End of make3AFCTrials
+        
+        //Function to sample a number of face objects from a PEArray and checks their z-score are all different
+        function sampleFrom(relevantArray, n){
+          
+          //Get a sample from the array without replacement
+          var sample = jsPsych.randomization.sampleWithoutReplacement(relevantArray,n);
+          
+          //If we are just choosing one, then we just return the array of a single object
+          if(n === 1){
+            return sample;
+          }
+          //Else we check to make sure that they all have different z-scores
+          else{
+            
+            //Flag to check if it is a duplicate
+            var duplicate = false;
+            
+            //Array to hold the z-scores
+            var zScoresArray = [];
+            
+            //Load in all the z-scores
+            for(var i = 0; i < sample.length; i++){
+              zScoresArray.push(sample[i].zScore);
+            }
+            
+            //Sort the array based on z-score
+            sample = sample.sort(function(a,b){return (b.zScore - a.zScore); });
+            
+            //Loop through the array to see if any of them are duplicates
+            for(var i = 0; i < sample.length-1; i++){
+              //If the current zScore is the same as the next zScore, then we know that there is a duplicate
+              if(sample[i].zScore === sample[i+1].zScore){
+                //Set the flag to true
+                duplicate = true;
+              }
+            }//End of for loop
+            
+            //If it is a duplicate
+            if(duplicate){
+              //Recusively call this function again to get another sample and check again
+              return sampleFrom(relevantArray,n);
+            }
+            //Else we have found a distinct sample
+            else{
+              //Return the sample
+              return sample;
+            }
+                
+            
+            
+            
+          }//End of if-else
+          
+          
+          
+          
+        }//End of sampleFrom
         
         //Function to make the image html tag
         function makeImageHTML(path){
@@ -740,6 +828,8 @@
               PE: PE,
               gender: face1.gender,
               zScoreDiff: face1.zScore - face2.zScore,
+              targetZScore: face1.zScore > face2.zScore ? face1.zScore : face2.zScore,
+              nonTargetZScore: face1.zScore < face2.zScore ? face1.zScore : face2.zScore,
               //Face 1 data
               faceNumber1:face1.faceNumber,
               zScore1: face1.zScore,
@@ -833,6 +923,9 @@
               PE: PE,
               gender: face1.gender,
               zScoreDiff: triplet[0].zScore - triplet[1].zScore, //triplet is unshuffled
+              targetZScore: triplet[0].zScore,
+              nonTargetZScore: triplet[1].zScore,
+              distractorZScore: triplet[2].zScore,
               //Face 1 data
               faceNumber1:face1.faceNumber,
               zScore1: face1.zScore,
@@ -860,7 +953,7 @@
               PE: PE
             },
             on_start: function(trial){
-              //Get the data object from the last trial
+              //Get the data object from the last trial (the 3AFC trial)
               var data = jsPsych.data.get().last(1);
               //Get the chosen number from the data object
               var chosenFace = data.chosenFace;
@@ -888,7 +981,6 @@
         
         //Function to add the data to the final iteration
         function addDataToTrial(data){
-          console.log(data);
           
           //Get the face that was chosen, in the form of 0 or 1 (0 means first face, 1 means second face).
           var choice = parseInt(data.button_pressed); //Parse it from string to int
@@ -924,14 +1016,28 @@
             data.chosenFace = "distractor";
           }
           
+          //If the subject chose the first face
+          if(choice === 0){
+            //Add the z-score data of the chosen face
+            data.chosenZScore = data.zScore1;
+          }
+          //Else if the subject chose the second face
+          else if(choice === 1){
+            //Add the z-score data of the chosen face
+            data.chosenZScore = data.zScore2;
+          }
+          //Else if the subject chose the third face
+          if(choice === 2){
+            //Add the z-score data of the chosen face
+            data.chosenZScore = data.zScore3;
+          }
+          
         }//End of addDataToTrial
         
         //Function to add the data to the confidence trial using the on_start function
         function confidence_on_start_function(trial){
           //Get the data object from the last trial
           var data = jsPsych.data.get().last(1).values()[0];
-          console.log("data:");
-          console.log(data);
           //Get the chosen number from the choice trial data object
           var chosenFace = data.chosenFace;
           //Add that information to the confidence trial's data
@@ -963,8 +1069,12 @@
             pages:[
               page1
             ],
+            on_start: function(){
+              //Set the variable to true so that we submit the HIT
+              allPhasesCompleted = true;
+            },
             show_clickable_nav: true
-          };
+          };//End of return
           
         }//End of makeInstructions1 function
         
@@ -992,7 +1102,10 @@
             if(psiTurkIsOn){
               psiturk.saveData({ 
                 success: function(){
-                  psiturk.completeHIT(); //Complete the HIT
+                  //Only submit the HIT if all phases are completed
+                  if(allPhasesCompleted){
+                    psiturk.completeHIT(); //Complete the HIT
+                  }
                 }
               });
             }
