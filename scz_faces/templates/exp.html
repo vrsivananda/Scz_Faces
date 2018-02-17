@@ -12,6 +12,7 @@
         <!--jsPsych plugins start-->
         <script src="../static/js/jsPsych-6.0.1/plugins/jspsych-image-slider-response.js"></script>
         <script src="../static/js/jsPsych-6.0.1/plugins/jspsych-html-slider-response.js"></script>
+        <script src="../static/js/jsPsych-6.0.1/plugins/jspsych-survey-multi-choice.js"></script>
         </script><script src="../static/js/jsPsych-6.0.1/plugins/jspsych-call-function.js"></script>
         <script src="../static/js/jsPsych-6.0.1/plugins/jspsych-instructions.js"></script>
        <!-- <script src="../static/js/jsPsych-6.0.1/plugins/jspsych-html-keyboard-response.js"></script> -->
@@ -43,9 +44,25 @@
         var psiTurkIsOn = 0;   // 0: Test locally.  1: Test/Run on psiTurk
         var savingLocally = 1; // 0: Nothing.       1: Download CSV file
         var displayData = 0;   // 0: Nothing.       1: Display data on browser
-        var username = '';     // Username for psiturk server
-        var tableName = '';    // MySQL Table Name 
-        var folderName = '';   // Folder containing the experiment
+        var savingToDatabase = 1;//Should be 1 when psiturkIsOn
+        
+        var username = 'odegaard';     // Username for psiturk server
+        var tableName = 'Scz_Faces';    // MySQL Table Name 
+        var folderName = 'scz_faces';   // Folder containing the experiment
+        
+        //Get the workerID, etc. if we are saving to Database
+        if(savingToDatabase){
+          var workerId = $_GET('workerID');
+          var assignmentId = $_GET('assignmentID');
+          var hitId = $_GET('hitID');
+          
+          console.log("workerId:");
+          console.log(workerId);
+          console.log("assignmentId:");
+          console.log(assignmentId);
+          console.log("hitId:");
+          console.log(hitId);
+        }
         
         
         // Load psiturk
@@ -58,8 +75,8 @@
         //-----------------Your code below this line-----------------//
         
         //Parameters
-        nTrials2AFC = 8; //Must be multiple of 4 for counterbalancing gender & PE
-        nTrials3AFC = 8; //Must be multiple of 8 for counterbalancing gender, PE & norm
+        nTrials2AFC = 104; //Must be multiple of 4 for counterbalancing gender & PE
+        nTrials3AFC = 104; //Must be multiple of 8 for counterbalancing gender, PE & norm
         
         
         //Global variables to be filled in by functions below
@@ -89,12 +106,12 @@
           {path: '../static/images/female/AF08NES.JPG'},
           {path: '../static/images/female/AF09NES.JPG'},
           {path: '../static/images/female/AF10NES.JPG'},
-  /*        {path: '../static/images/female/AF11NES.JPG'},
+          {path: '../static/images/female/AF11NES.JPG'},
           {path: '../static/images/female/AF12NES.JPG'},
           {path: '../static/images/female/AF13NES.JPG'},
           {path: '../static/images/female/AF14NES.JPG'},
           {path: '../static/images/female/AF15NES.JPG'}
-  */      ];
+        ];
 
         //The array of female stumuli
         var male_stimuli = [
@@ -108,25 +125,27 @@
           {path: '../static/images/male/AM08NES.JPG'},
           {path: '../static/images/male/AM09NES.JPG'},
           {path: '../static/images/male/AM10NES.JPG'},
-  /*        {path: '../static/images/male/AM11NES.JPG'},
+          {path: '../static/images/male/AM11NES.JPG'},
           {path: '../static/images/male/AM12NES.JPG'},
           {path: '../static/images/male/AM13NES.JPG'},
           {path: '../static/images/male/AM14NES.JPG'},
           {path: '../static/images/male/AM15NES.JPG'}
-  */      ];
+        ];
         
         //Extract the info of objects in the array
         female_stimuli = extractInfo(female_stimuli);
         male_stimuli = extractInfo(male_stimuli);
         
-        console.log(female_stimuli);
-        console.log(male_stimuli);
+        console.log("female_stimuli:");
+        console.log(JSON.parse(JSON.stringify(female_stimuli)));
+        console.log("male_stimuli:");
+        console.log(JSON.parse(JSON.stringify(male_stimuli)));
         
         //Make the instructions for phase 1
         var instructionsBlock1 = makeInstructions1();
         
         //Make the first phase
-        var phase1 = makePhase1();
+        var phase1 = makePhase1(); 
         
         //Prep for second phase (calculate mean, sd, z-scores, etc.)
         var prepForPhase2 = makePrepForPhase2();//AFC2Array and AFC3Array are made here
@@ -189,6 +208,12 @@
           }//End of loop_function
         };//End of loop Node
         
+        //Instructions block for the questionnaires
+        var instructionsBlock3 = makeInstructions3();
+        
+        //Survey block
+        var surveyBlock = makeSurvey();
+        
         //Debrief block
         var debriefBlock = makeDebriefBlock();
         
@@ -201,6 +226,8 @@
         timeline.push(prepForPhase2);
         timeline.push(instructionsBlock2);
         timeline.push(loopNode);
+        timeline.push(instructionsBlock3);
+        timeline.push(surveyBlock);
         timeline.push(debriefBlock);
         
         
@@ -246,7 +273,7 @@
           
           //Page 1 instructions
           var page1 = "Welcome to the experiment!<br/>" + 
-            "There will be two phases to this experiment, and you will receive separate instructions for each phase.";
+            "There will be three phases to this experiment, and you will receive separate instructions for each phase.";
             
           //Page 2 instructions
           var page2 = "Your task in phase 1 is to <b>rate the attractiveness</b> of each of the faces that are presented. <br/>" + 
@@ -278,7 +305,7 @@
           
         }//End of makeInstructions1 function
         
-        //Function to make the first instructions block
+        //Function to make the second instructions block
         function makeInstructions2(){
           
           //Page 1 instructions
@@ -315,7 +342,33 @@
             show_clickable_nav: true
           };
           
-        }//End of makeInstructions1 function
+        }//End of makeInstructions3 function
+        
+        //Function to make the third instructions block
+        function makeInstructions3(){
+          
+          //Page 1 instructions
+          var page1 = "Amazing work on phase 2! <br/>" + 
+            "You are almost done! <br/>" + 
+            "We will now move on to phase 3 of the experiment.";
+            
+          //Page 2 instructions
+          var page2 = "Phase 3 is a set of 21 simple yes/no questions.<br/>" +
+            "Please note that you will have to answer all the questions to continue.<br/>" +
+            "We ask that you answer this truthfully as your responses are anonymous and will not affect your compensation.";
+            
+          //Load it into a trial object and return it
+          return {
+            type: 'instructions',
+            pages:[
+              page1,
+              page2
+            ],
+            show_clickable_nav: true
+          };
+          
+        }//End of makeInstructions3 function
+        
         
         //Function to make phase 1 (the face rating phase)
         function makePhase1(){
@@ -415,10 +468,10 @@
           var phase1Part1 = jsPsych.randomization.shuffle(phase1Part1);
           
           //Make a copy of the previous array, shuffle it, and save it as the second part
-          var phase2Part2 = jsPsych.randomization.shuffle(phase1Part1.slice(0));
+          var phase1Part2 = jsPsych.randomization.shuffle(phase1Part1.slice(0));
           
           //Concatenate the arrays to form the first phase
-          var phase1Array = phase1Part1.concat(phase2Part2);
+          var phase1Array = phase1Part1.concat(phase1Part2);
           
           //Shuffle the array and return it
           return {
@@ -547,7 +600,6 @@
           
           //Sort the array of faces based on the z-score (start of array is highest score)
           relevantArray = relevantArray.sort(function(a,b){return (b.zScore - a.zScore); });
-          console.log(relevantArray);
           
           //Assign the rankings to the array
           for(var i = 0; i < relevantArray.length; i++){
@@ -566,13 +618,13 @@
           lowPEFemaleArray = makePEArray(female_stimuli,"low"); //Global variable
           
           console.log("highPEMaleArray:");
-          console.log(highPEMaleArray);
+          console.log(JSON.parse(JSON.stringify(highPEMaleArray)));
           console.log("highPEFemaleArray:");
-          console.log(highPEFemaleArray);
+          console.log(JSON.parse(JSON.stringify(highPEFemaleArray)));
           console.log("lowPEMaleArray:");
-          console.log(lowPEMaleArray);
+          console.log(JSON.parse(JSON.stringify(lowPEMaleArray)));
           console.log("lowPEFemaleArray:");
-          console.log(lowPEFemaleArray);
+          console.log(JSON.parse(JSON.stringify(lowPEFemaleArray)));
           
                     
           //If any of the four arrays have less than 3 elements or if the subject answered all phase 1 questions below 1 second, then we kill the experiment
@@ -620,7 +672,7 @@
           }//End of for loop
           
           console.log("AFC2Array: ");
-          console.log(AFC2Array);
+          console.log(JSON.parse(JSON.stringify(AFC2Array)));
             
         }//End of make2AFCTrials
         
@@ -689,7 +741,7 @@
           }//End of for loop
           
           console.log("AFC3Array: ");
-          console.log(AFC3Array);
+          console.log(JSON.parse(JSON.stringify(AFC3Array)));
           
         }//End of make3AFCTrials
         
@@ -737,16 +789,10 @@
             //Else we have found a distinct sample
             else{
               //Return the sample
-              return sample;
-            }
-                
+              return jsPsych.randomization.shuffle(sample);
+            }//End of inner if-else
             
-            
-            
-          }//End of if-else
-          
-          
-          
+          }//End of outer if-else (if n === 1)
           
         }//End of sampleFrom
         
@@ -1055,11 +1101,87 @@
           choiceTrial.response = data.response;
         }
         
+        //Function to make the survey block
+        function makeSurvey(){
+          
+          //Declare the questions array
+          var questionsArray = [
+            "1. Do you ever feel as if people seem to drop hints about you or say things with double meaning?",
+            "2. Do you ever feel as if things in magazines or TV were written especially for you?",
+            "3. Do you ever feel as if some people are not what they seem to be?",
+            "4. Do you ever feel as if you are being persecuted in some way?",
+            "5. Do you ever feel as if there is a conspiracy against you?",
+            "6. Do you ever feel as if you are, or destined to be someone very important?",
+            "7. Do you ever feel that you are a very special or unusual person?",
+            "8. Do you ever feel that you are especially close to God?",
+            "9. Do you ever think people can communicate telepathically?",
+            "10. Do you ever feel as if electrical devices such as computers can influence the way you think?",
+            "11. Do you ever feel as if you have been chosen by God in some way?",
+            "12. Do you believe in the power of witchcraft, voodoo or the occult?",
+            "13. Are you often worried that your partner may be unfaithful?",
+            "14. Do you ever feel that you have sinned more than the average person?",
+            "15. Do you ever feel that people look at you oddly because of your appearance?",
+            "16. Do you ever feel as if you had no thoughts in your head at all?",
+            "17. Do you ever feel as if the world is about to end?",
+            "18. Do your thoughts ever feel alien to you in some way?",
+            "19. Have your thoughts ever been so vivid that you were worried other people would hear them?",
+            "20. Do you ever feel as if your own thoughts were being echoed back to you?",
+            "21. Do you ever feel as if you are a robot or zombie without a will of your own?"
+          ];
+          
+          //Declare the options
+          var options = ["Yes","No"];
+          
+          //Declare an array of questionObjects
+          var questionObjectsArray = [];
+          
+          //Loop through the questions Array and make the question objects
+          for(var i = 0; i < questionsArray.length; i++){
+            
+            //Push the question object into the array
+            questionObjectsArray.push({
+              prompt: questionsArray[i],
+              options: options,
+              required: true
+            });
+            
+          }//End of for loop
+          
+          //Make the trial object and return it
+          return {
+            type: 'survey-multi-choice',
+            questions: questionObjectsArray,
+            on_finish: function(data){
+              
+              //Declare a counter for the PDI
+              var PDICounter = 0;
+              
+              //Parse the responses
+              var responseObject = JSON.parse(data.responses);
+
+              //Loop through the properties of the object
+              for(var property in responseObject){
+                //Get the current response
+                var currentResponse = responseObject[property];
+                //If the answer was "Yes", then we increment the counter
+                if(currentResponse === "Yes"){
+                  PDICounter++;
+                }
+              }//End of for loop
+              
+              //Add the counter data to the data object
+              data.PDIScore = PDICounter;
+              
+            }//End of on_finish
+          };//End of return
+          
+        }//End of makeSurvey
+        
         //Function to make the debrief block
         function makeDebriefBlock(){
           
           //Page 1 instructions
-          var page1 = "Good work!<br/>" + 
+          var page1 = "Great work!<br/>" + 
             "You have successfully completed the experiment.<br/>" +
             "Click on the 'Next' button to officially end the experiment and submit the HIT.";
             
@@ -1076,7 +1198,7 @@
             show_clickable_nav: true
           };//End of return
           
-        }//End of makeInstructions1 function
+        }//End of makeDebriefBlock function
         
 
         //================================
@@ -1111,7 +1233,7 @@
             }
           },
           on_trial_finish: function(){ //Execute this after every trial
-            if (psiTurkIsOn){
+            if (savingToDatabase){
               save_data(tableName, [jsPsych.data.get().last(1).values()[0]]);
             }
           }
@@ -1123,14 +1245,28 @@
         //A function to save the data to the SQL table on the psiturk server.  This gets called at the end of the file.
         function save_data(data_table,data){
           
-          //Retrieve data from psiTurk and add to jsPsych data 
-          jsPsych.data.addProperties(
-            {
-              subject: psiturk.taskdata.get('workerId'),
-              assignmentId: psiturk.taskdata.get('assignmentId'),
-              hitId: psiturk.taskdata.get('hitId') 
-            }
-          );
+          if(psiTurkIsOn){
+            //Retrieve data from psiTurk and add to jsPsych data 
+            jsPsych.data.addProperties(
+              {
+                subject: psiturk.taskdata.get('workerId'),
+                assignmentId: psiturk.taskdata.get('assignmentId'),
+                hitId: psiturk.taskdata.get('hitId') 
+              }
+            );
+          }
+          //Else psiturk is not on
+          else{
+            //Get the workerID from the URL and return it
+            //Add data to the jsPsych data file
+            jsPsych.data.addProperties({
+                workerId: workerId,
+                assignmentId: assignmentId,
+                hitId: hitId
+            });
+            
+          }
+          
           
           //Use AJAX to post the data onto the psiturk server
           $.ajax({
@@ -1143,9 +1279,30 @@
             },
             success: function(output) { console.log(output); } // write the result to javascript console
           });
-        }
+        }//End of save_data
         
         //------psiTurk Functions End------
+        
+        
+        // Function to draw parameters from the URL
+        function $_GET(param) 
+        {
+            var vars = {};
+            window.location.href.replace( 
+                /[?&]+([^=&]+)=?([^&]*)?/gi, // regexp
+                function( m, key, value ) { // callback
+                    vars[key] = value !== undefined ? value : '';
+                }
+            );
+
+            if ( param ) 
+            {
+                console.log(vars);
+                console.log(param);
+                return vars[param] ? vars[param] : null;    
+            }
+            return vars;
+        }
 
 
 
