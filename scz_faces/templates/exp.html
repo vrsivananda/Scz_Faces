@@ -41,10 +41,11 @@
     <script>
     
         //Data switches
-        var psiTurkIsOn = 1;   // 0: Test locally.  1: Test/Run on psiTurk
-        var savingLocally = 0; // 0: Nothing.       1: Download CSV file
+        var psiTurkIsOn = 0;   // 0: Test locally.  1: Test/Run on psiTurk
+        var savingLocally = 1; // 0: Nothing.       1: Download CSV file
         var displayData = 0;   // 0: Nothing.       1: Display data on browser
-        var savingToDatabase = 1;//Should be 1 when psiturkIsOn
+        var savingToDatabase = 0;//Should be 1 when psiturkIsOn
+        savingToDatabase = psiTurkIsOn ? 1 : savingToDatabase;//Safeguard to ensure that it saves to the database if psiturk is on
         
         var username = 'odegaard';     // Username for psiturk server
         var tableName = 'Scz_Faces';    // MySQL Table Name 
@@ -75,8 +76,9 @@
         //-----------------Your code below this line-----------------//
         
         //Parameters
-        nTrials2AFC = 104; //Must be multiple of 4 for counterbalancing gender & PE
-        nTrials3AFC = 104; //Must be multiple of 8 for counterbalancing gender, PE & norm
+        //nTrials2AFC = 104; //Must be multiple of 4 for counterbalancing gender & PE
+        nTrials3AFC = 208; //Must be multiple of 8 for counterbalancing gender, PE & norm
+        nFacesPerGender = 10; //How many faces to keep from each gender for the AFC trials
         
         
         //Global variables to be filled in by functions below
@@ -192,7 +194,7 @@
           }
         };
         
-        //The loop node that loops through the AFC2Array and play all the trials
+        //The loop node that loops through the phase2Array and play all the trials
         var loopNode = {
           timeline: [AFCTrial,confidenceTrial],//Insert the token trials into the timeline
           loop_function: function(data){//Return true to loop
@@ -314,7 +316,7 @@
             
           //Page 2 instructions
           var page2 = "Your task in phase 2 is to <b>compare the attractiveness</b> of the faces that are presented. <br/>" + 
-            "There will be either two or three faces being presented, and you will <b>click on the most attractive face.</b> <br/>";
+            "There will be three faces being presented, and you will <b>click on the most attractive face.</b> <br/>";
             
           //Page 3 instructions
           var page3 = "Once you have chosen the most attractive face, a slider will be presented.<br/>" + 
@@ -499,6 +501,16 @@
                 else if(j === 1){
                   var relevantArray = female_stimuli;
                 }
+                
+                //Truncate the array
+                truncateArray(relevantArray);
+                
+                //Print out the array to see it
+                console.log("relevantArray sorted by differenceRating:");
+                console.log(JSON.parse(JSON.stringify(relevantArray)));
+                
+                //Calculate rankings and sort the array based on averageRating
+                calculateRankings(relevantArray);
               
                 //Calculate the mean and SD and update the stimuli array with them
                 calculateMeanAndSD(relevantArray);
@@ -506,9 +518,8 @@
                 //Calculate the z-score
                 calculateZScore(relevantArray);
                 
-                //Calculate rankings and sort the array
-                calculateRankings(relevantArray);
-                
+                //Print out the array to see it
+                console.log("relevantArray sorted by averageRating:");
                 console.log(JSON.parse(JSON.stringify(relevantArray)));
               
               }//End of for loop
@@ -517,7 +528,7 @@
               makeAndCheckPEArrays(); //If it is not good enough, this will short-circuit the timeline and end the experiment
               
               //Make the 2AFC Trials, which is stored in the global variable AFC2Array
-              make2AFCTrials();
+              //make2AFCTrials();
               
               //Make the 3AFC Trials, which is stored in the global variable AFC3Array
               make3AFCTrials();
@@ -529,6 +540,39 @@
             
           }//End of return object
         }//End of makePrepForPhase2
+        
+        
+        //Function to take out the faces with the largest rating differences
+        function truncateArray(relevantArray){
+          
+          //For loop to calculate the difference between the first and second faces
+          for(var i = 0; i < relevantArray.length; i++){
+            
+            //Get the difference and ad it in as an attribute to the object
+            relevantArray[i].ratingDifference = Math.abs(relevantArray[i].rating1 - relevantArray[i].rating2);
+            
+          }//End of for loop
+          
+          //Sort the array based on their ratingDifference (smallest to largest)
+          relevantArray = relevantArray.sort(function(a,b){return (a.ratingDifference - b.ratingDifference); });
+          
+          //Truncate the array to the desired length
+          relevantArray.length = nFacesPerGender;
+          
+        }//End of truncateArray
+        
+        //Function to rank the faces within each gender
+        function calculateRankings(relevantArray){
+          
+          //Sort the array of faces based on the z-score (start of array is highest score)
+          relevantArray = relevantArray.sort(function(a,b){return (b.averageRating - a.averageRating); });
+          
+          //Assign the rankings to the array
+          for(var i = 0; i < relevantArray.length; i++){
+            relevantArray[i].rank = i+1;
+          }
+          
+        }//End of calculateRankings
         
         //Function to calculate the mean and SD and update the stimuli array with the values
         function calculateMeanAndSD(relevantArray){
@@ -574,7 +618,6 @@
           
         }//End of calculateMeanAndSD
         
-        
         //Function that calculates the z-scores for each face
         function calculateZScore(relevantArray){
           
@@ -593,20 +636,6 @@
           }//End of for loop
           
         }//End of calculateZScore
-        
-        
-        //Function to rank the faces within each gender
-        function calculateRankings(relevantArray){
-          
-          //Sort the array of faces based on the z-score (start of array is highest score)
-          relevantArray = relevantArray.sort(function(a,b){return (b.zScore - a.zScore); });
-          
-          //Assign the rankings to the array
-          for(var i = 0; i < relevantArray.length; i++){
-            relevantArray[i].rank = i+1;
-          }
-          
-        }//End of calculateRankings
         
         //Function to check if there is a good distribution of z-scores. If there isn't this will short-circuit the timeline and end the experiment
         function makeAndCheckPEArrays(){
