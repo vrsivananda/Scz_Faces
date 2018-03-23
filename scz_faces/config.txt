@@ -12,7 +12,7 @@ organization_name = University of California-Los Angeles
 browser_exclude_rule = mobile, tablet, touchcapable, MSIE
 
 [Database Parameters]
-database_url = mysql://<databaseLogin>:<databasePassword>@sirius.lifesci.ucla.edu:3306/psych_qualia
+database_url = mysql://qualia_01:Bgt5kn|e@sirius.lifesci.ucla.edu:3306/psych_qualia
 table_name = turkdemo
 
 [Server Parameters]

@@ -41,8 +41,8 @@
     <script>
     
         //Data switches
-        var psiTurkIsOn = 0;   // 0: Test locally.  1: Test/Run on psiTurk
-        var savingLocally = 1; // 0: Nothing.       1: Download CSV file
+        var psiTurkIsOn = 1;   // 0: Test locally.  1: Test/Run on psiTurk
+        var savingLocally = 0; // 0: Nothing.       1: Download CSV file
         var displayData = 0;   // 0: Nothing.       1: Display data on browser
         var savingToDatabase = 1;//Should be 1 when psiturkIsOn
         
@@ -52,9 +52,9 @@
         
         //Get the workerID, etc. if we are saving to Database
         if(savingToDatabase){
-          var workerId = $_GET('workerID');
-          var assignmentId = $_GET('assignmentID');
-          var hitId = $_GET('hitID');
+          var workerId = $_GET('workerId');
+          var assignmentId = $_GET('assignmentId');
+          var hitId = $_GET('hitId');
           
           console.log("workerId:");
           console.log(workerId);
@@ -1249,7 +1249,7 @@
             //Retrieve data from psiTurk and add to jsPsych data 
             jsPsych.data.addProperties(
               {
-                subject: psiturk.taskdata.get('workerId'),
+                workerId: psiturk.taskdata.get('workerId'),
                 assignmentId: psiturk.taskdata.get('assignmentId'),
                 hitId: psiturk.taskdata.get('hitId') 
               }
