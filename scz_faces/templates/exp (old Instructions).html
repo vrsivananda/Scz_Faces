@@ -15,8 +15,7 @@
         <script src="../static/js/jsPsych-6.0.1/plugins/jspsych-survey-multi-choice.js"></script>
         </script><script src="../static/js/jsPsych-6.0.1/plugins/jspsych-call-function.js"></script>
         <script src="../static/js/jsPsych-6.0.1/plugins/jspsych-instructions.js"></script>
-        <script src="../static/js/jsPsych-6.0.1/plugins/jspsych-animation.js"></script>
-        <script src="../static/js/jsPsych-6.0.1/plugins/jspsych-fullscreen.js"></script>
+       <!-- <script src="../static/js/jsPsych-6.0.1/plugins/jspsych-html-keyboard-response.js"></script> -->
         <script src="../static/js/jsPsych-6.0.1/plugins/jspsych-html-button-response.js"></script>
         <!--jsPsych plugins end-->
         
@@ -36,8 +35,6 @@
         <script src="../static/js/utils.js" type="text/javascript"></script>
         <script src="../static/js/psiturk.js" type="text/javascript"></script>
         <!--PsiTurk inserts end-->
-        <!--Include the faces for animation-->
-        <script src="animationImages.js"></script>
     </head>
     <body>
     </body>
@@ -50,9 +47,9 @@
         var savingToDatabase = 0;//Should be 1 when psiturkIsOn
         savingToDatabase = psiTurkIsOn ? 1 : savingToDatabase;//Safeguard to ensure that it saves to the database if psiturk is on
         
-        var username = '';     // Username for psiturk server
-        var tableName = '';    // MySQL Table Name 
-        var folderName = '';   // Folder containing the experiment
+        var username = 'odegaard';     // Username for psiturk server
+        var tableName = 'Scz_Faces';    // MySQL Table Name 
+        var folderName = 'scz_faces';   // Folder containing the experiment
         
         //Get the workerID, etc. if we are saving to Database
         if(savingToDatabase){
@@ -98,10 +95,6 @@
         
         //Variable to keep track of whether the subject answered all the phase1 questions below 1s
         var subjectAnsweredAllPhase1Below1Second = true; //Changed in the on_finish function of the phase 1 questions
-        
-        //Wrappers for font sizes
-        var wrapperStart = "<div style='font-size: 24px; font-family: Helvetica, sans-serif'>";
-        var wrapperEnd = "</div>";
         
         //The array of male stimuli
         var female_stimuli = [
@@ -230,14 +223,13 @@
         var timeline = [];
         
         //Push the trials into the timeline array
-        timeline.push(makeFullscreenBlock());
         timeline.push(instructionsBlock1);
-  /*      timeline.push(phase1);
+        timeline.push(phase1);
         timeline.push(prepForPhase2);
-  */      timeline.push(instructionsBlock2);
-  //      timeline.push(loopNode);
+        timeline.push(instructionsBlock2);
+        timeline.push(loopNode);
         timeline.push(instructionsBlock3);
-  //      timeline.push(surveyBlock);
+        timeline.push(surveyBlock);
         timeline.push(debriefBlock);
         
         
@@ -277,184 +269,79 @@
           
         }//End of extractInfo function
         
-        //Function to return the block that makes the experiment fullscreen
-        function makeFullscreenBlock(){
-          return{
-            type: 'fullscreen',
-            button_label: 'Next >',
-            message: wrapperStart +
-              'When you click "Next" below, your browser will be in fullscreen mode.<p></p>' +
-              wrapperEnd,
-            fullscreen_mode: true
-          };
-        }
         
         //Function to make the first instructions block
         function makeInstructions1(){
           
-          //---------- Welcome Screen ----------
-          
-          //Welcome Screen Text
-          var welcomeScreenText = wrapperStart +
-            "Welcome to the experiment!<br/><br/>" + 
-            "There will be three phases to this experiment, and you will receive separate instructions for each phase.<p></p>" +
-            wrapperEnd;
+          //Page 1 instructions
+          var page1 = "Welcome to the experiment!<br/>" + 
+            "There will be three phases to this experiment, and you will receive separate instructions for each phase.";
             
-          //Create the welcome screen
-          var welcomeScreen = {
-            type: 'instructions',
-            pages:[
-              welcomeScreenText
-            ],
-            show_clickable_nav: true
-          };
-          
-          //---------- Instructions ----------
-
-          //Instructions prompt
-          var htmlContent = wrapperStart +
-            "<p> Your task in phase 1 is to <b>rate the attractiveness</b> of each of the faces that are presented. <br/>" + 
-            "Here is an image of a sample trial:<br/></p>" +
-            "<img style='height:450px; width:800px; border:2px solid black; border-radius: 5px' src='../static/images/samplePhase1TrialImage.png'>" + 
-            "<p>Slide the slider based on how attractive or unattractive you think they are. <br/><br/>" +
-            "Drag the slider to the <b>left</b> if they are <b>unattractive</b>, and drag the slider to the <b>right</b> if you think they are <b>attractive</b>.</p>" +
-            wrapperEnd;
+          //Page 2 instructions
+          var page2 = "Your task in phase 1 is to <b>rate the attractiveness</b> of each of the faces that are presented. <br/>" + 
+            "If you think they are attractive, slide the slider to the right based on how attractive you think they are (further right means more attractive.) <br/>" +
+            "If you think they are unattractive, slide the slider to the left based on how unattractive they are (further left means less attractive.)";
             
-          //Create the instructions with the image
-          var instructionsScreen = {
-            type: 'html-button-response',
-            stimulus: htmlContent,
-            choices: ['Next >'],
-            prompt: wrapperStart +
-              'Press "Next" to see an animated demonstration.' +
-              wrapperEnd
-          };
-          
-          //---------- Animation ----------
+          //Page 3 instructions
+          var page3 = "<b>*Important* </b>: " + 
+            "Please make sure that your window is in <b>fullscreen</b> mode. <br/>" + 
+            "If it is not in fullscreen, <i>please do so <b>now</b></i>. <br/>" + 
+            "This is to ensure that the images are displayed in the correct size.";
             
-          //Animation
-          var animationScreen = {
-            type: 'animation',
-            stimuli: phase1AnimationArray,
-            sequence_reps: 50,
-            prompt: wrapperStart +
-              '<br/> This is a demonstration of two trials. <br/>Press <b>Enter</b> when you are ready to start the experiment.' +
-              wrapperEnd,
-            choices: [13]
-          };
-          
-          //---------- End Of Instructions ----------
+          //Page 4 instructions
+          var page4 = "Please also note that you will have to move the slider from its initial position to continue. <br/><br/>" +
+            "This is the end of the instructions. <br/>" + 
+            "Please click 'next' to start the experiment.";
             
-          //End of instructions instructions
-          var endOfInstructionsText = wrapperStart +
-            "Also, you cannot advance unless you move the slider. <br/><br/>" +
-            "Click 'Next' to start the experiment." +
-            wrapperEnd;
-            
-          var endOfInstructionsScreen = {
-            type: 'instructions',
-            pages:[
-              endOfInstructionsText
-            ],
-            show_clickable_nav: true
-            
-          };
-          
-          //---------- Put it all together ----------
-          
+          //Load it into a trial object and return it
           return {
-            timeline: [
-              welcomeScreen,
-              instructionsScreen,
-              animationScreen,
-              endOfInstructionsScreen
-            ]
+            type: 'instructions',
+            pages:[
+              page1,
+              page2,
+              page3,
+              page4
+            ],
+            show_clickable_nav: true
           };
           
         }//End of makeInstructions1 function
         
         //Function to make the second instructions block
         function makeInstructions2(){
-            
-          //---------- Welcome Screen ----------
           
-          //Phase2 Intro Text
-          var phase2IntroText = wrapperStart +
-            "Great job on phase 1!<br/><br/>" + 
-            "We will now move on to phase 2 of the experiment." +
-            wrapperEnd;
+          //Page 1 instructions
+          var page1 = "Great job on phase 1!<br/>" + 
+            "We will now move on to phase 2 of the experiment.";
             
-          //Create the welcome screen
-          var phase2IntroScreen = {
-            type: 'instructions',
-            pages:[
-              phase2IntroText
-            ],
-            show_clickable_nav: true
-          };
+          //Page 2 instructions
+          var page2 = "Your task in phase 2 is to <b>compare the attractiveness</b> of the faces that are presented. <br/>" + 
+            "There will be three faces being presented, and you will <b>click on the most attractive face.</b> <br/>";
             
-          //---------- Instructions ----------
-
-          //Instructions prompt
-          var htmlContent = wrapperStart +
-            "<p>Your task in phase 2 is to <b>click on the most attractive face.</b><br/><br/>" + 
-            "Here is an image of a sample trial:<br/></p>" +
-            "<img style='height:450px; width:800px; border:2px solid black; border-radius: 5px' src='../static/images/samplePhase2TrialImage.png'>" + 
-            "<p> Once you have chosen the most attractive face, a slider will be presented.<br/><br/>" + 
-            "<b>Slide the slider based on how confident you are about your choice.</b><br/>" +
-            wrapperEnd;
+          //Page 3 instructions
+          var page3 = "Once you have chosen the most attractive face, a slider will be presented.<br/>" + 
+            "<b>Slide the slider based on how confident you are about your choice.</b><br/>" + 
+            "If you are CERTAIN that you picked the most attractive face, then slide it all the way to the right.<br/>" + 
+            "If you are uncertain, then slide it a little to the right based on how uncertain you are.<br/><br/>" +
+            "<i>Make sure to use the full length of the slider to indicate your confidence.</i>";
             
-          //Create the instructions with the image
-          var instructionsScreen = {
-            type: 'html-button-response',
-            stimulus: htmlContent,
-            choices: ['Next >'],
-            prompt: wrapperStart +
-              'Press "Next" to see a demonstration of a trial.' +
-              wrapperEnd
-          };
-          
-          //---------- Animation ----------
+          //Page 4 instructions
+          var page4 = "Remember to:<br/>" +
+            "(1) Click on the most attractive face, and <br/>" +
+            "(2) Slide the slider to indicate how confident you are that the face you chose was the most attractive out of all faces presented.<br/><br/>" + 
+            "This is the end of the instructions for phase 2.<br/>" + 
+            "Please click 'next' to start the experiment.";
             
-          //Animation
-          var animationScreen = {
-            type: 'animation',
-            stimuli: phase2AnimationArray,
-            frame_time: 500,
-            sequence_reps: 50,
-            prompt: wrapperStart +
-            '<br/> This is a demonstration of one trial. <br/>Press <b>Enter</b> when you are ready to start the experiment.' +
-            wrapperEnd,
-            choices: [13]
-          };
-          
-            
-          //---------- End Of Instructions ----------
-            
-          //End of instructions instructions
-          var endOfInstructionsText = wrapperStart +
-            "Just as before, you cannot advance unless you move the slider. <br/><br/>" +
-            "Click 'Next' to start the experiment." +
-            wrapperEnd;
-            
-          var endOfInstructionsScreen = {
-            type: 'instructions',
-            pages:[
-              endOfInstructionsText
-            ],
-            show_clickable_nav: true
-            
-          };
-          
-          //---------- Put it all together ----------
-          
+          //Load it into a trial object and return it
           return {
-            timeline: [
-              phase2IntroScreen,
-              instructionsScreen,
-              animationScreen,
-              endOfInstructionsScreen
-            ]
+            type: 'instructions',
+            pages:[
+              page1,
+              page2,
+              page3,
+              page4
+            ],
+            show_clickable_nav: true
           };
           
         }//End of makeInstructions3 function
@@ -463,18 +350,14 @@
         function makeInstructions3(){
           
           //Page 1 instructions
-          var page1 = wrapperStart +
-            "Amazing work on phase 2! <br/><br/>" + 
-            "You are almost done! <br/><br/>" + 
-            "We will now move on to phase 3 of the experiment." +
-            wrapperEnd;
+          var page1 = "Amazing work on phase 2! <br/>" + 
+            "You are almost done! <br/>" + 
+            "We will now move on to phase 3 of the experiment.";
             
           //Page 2 instructions
-          var page2 = wrapperStart +
-            "Phase 3 is a set of 21 simple yes/no questions.<br/><br/>" +
-            "You will have to answer all the questions to continue.<br/><br/>" +
-            "We ask that you answer this truthfully as your responses are anonymous and will not affect your compensation." +
-            wrapperEnd;
+          var page2 = "Phase 3 is a set of 21 simple yes/no questions.<br/>" +
+            "Please note that you will have to answer all the questions to continue.<br/>" +
+            "We ask that you answer this truthfully as your responses are anonymous and will not affect your compensation.";
             
           //Load it into a trial object and return it
           return {
@@ -1327,11 +1210,9 @@
         function makeDebriefBlock(){
           
           //Page 1 instructions
-          var page1 =  wrapperStart +
-            "Great work!<br/>" + 
+          var page1 = "Great work!<br/>" + 
             "You have successfully completed the experiment.<br/>" +
-            "Click on the 'Next' button to officially end the experiment and submit the HIT." +
-            wrapperEnd;
+            "Click on the 'Next' button to officially end the experiment and submit the HIT.";
             
           //Load it into a trial object and return it
           return {

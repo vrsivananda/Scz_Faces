@@ -124,6 +124,11 @@ jsPsych.plugins.animation = (function() {
       // after a valid response, the stimulus will have the CSS class 'responded'
       // which can be used to provide visual feedback that a response was recorded
       display_element.querySelector('#jspsych-animation-image').className += ' responded';
+      
+      
+      endTrial();//[sivaHack]
+      clearInterval(animate_interval);//[sivaHack]
+      showImage = false;//[sivaHack]
     }
 
     // hold the jspsych response listener object in memory
