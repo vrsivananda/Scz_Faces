@@ -44,8 +44,8 @@
     <script>
     
         //Data switches
-        var psiTurkIsOn = 0;   // 0: Test locally.  1: Test/Run on psiTurk
-        var savingLocally = 1; // 0: Nothing.       1: Download CSV file
+        var psiTurkIsOn = 1;   // 0: Test locally.  1: Test/Run on psiTurk
+        var savingLocally = 0; // 0: Nothing.       1: Download CSV file
         var displayData = 0;   // 0: Nothing.       1: Display data on browser
         var savingToDatabase = 0;//Should be 1 when psiturkIsOn
         savingToDatabase = psiTurkIsOn ? 1 : savingToDatabase;//Safeguard to ensure that it saves to the database if psiturk is on
@@ -105,40 +105,40 @@
         
         //The array of male stimuli
         var female_stimuli = [
-          {path: '../static/images/female/AF01NES.JPG'},
-          {path: '../static/images/female/AF02NES.JPG'},
-          {path: '../static/images/female/AF03NES.JPG'},
-          {path: '../static/images/female/AF04NES.JPG'},
-          {path: '../static/images/female/AF05NES.JPG'},
-          {path: '../static/images/female/AF06NES.JPG'},
-          {path: '../static/images/female/AF07NES.JPG'},
-          {path: '../static/images/female/AF08NES.JPG'},
-          {path: '../static/images/female/AF09NES.JPG'},
-          {path: '../static/images/female/AF10NES.JPG'},
-          {path: '../static/images/female/AF11NES.JPG'},
-          {path: '../static/images/female/AF12NES.JPG'},
-          {path: '../static/images/female/AF13NES.JPG'},
-          {path: '../static/images/female/AF14NES.JPG'},
-          {path: '../static/images/female/AF15NES.JPG'}
+          {path: '../static/images/female/AF01HAS.JPG'},
+          {path: '../static/images/female/AF02HAS.JPG'},
+          {path: '../static/images/female/AF03HAS.JPG'},
+          {path: '../static/images/female/AF04HAS.JPG'},
+          {path: '../static/images/female/AF05HAS.JPG'},
+          {path: '../static/images/female/AF06HAS.JPG'},
+          {path: '../static/images/female/AF07HAS.JPG'},
+          {path: '../static/images/female/AF08HAS.JPG'},
+          {path: '../static/images/female/AF09HAS.JPG'},
+          {path: '../static/images/female/AF10HAS.JPG'},
+          {path: '../static/images/female/AF11HAS.JPG'},
+          {path: '../static/images/female/AF12HAS.JPG'},
+          {path: '../static/images/female/AF13HAS.JPG'},
+          {path: '../static/images/female/AF14HAS.JPG'},
+          {path: '../static/images/female/AF15HAS.JPG'}
         ];
 
         //The array of female stumuli
         var male_stimuli = [
-          {path: '../static/images/male/AM01NES.JPG'},
-          {path: '../static/images/male/AM02NES.JPG'},
-          {path: '../static/images/male/AM03NES.JPG'},
-          {path: '../static/images/male/AM04NES.JPG'},
-          {path: '../static/images/male/AM05NES.JPG'},
-          {path: '../static/images/male/AM06NES.JPG'},
-          {path: '../static/images/male/AM07NES.JPG'},
-          {path: '../static/images/male/AM08NES.JPG'},
-          {path: '../static/images/male/AM09NES.JPG'},
-          {path: '../static/images/male/AM10NES.JPG'},
-          {path: '../static/images/male/AM11NES.JPG'},
-          {path: '../static/images/male/AM12NES.JPG'},
-          {path: '../static/images/male/AM13NES.JPG'},
-          {path: '../static/images/male/AM14NES.JPG'},
-          {path: '../static/images/male/AM15NES.JPG'}
+          {path: '../static/images/male/AM01HAS.JPG'},
+          {path: '../static/images/male/AM02HAS.JPG'},
+          {path: '../static/images/male/AM03HAS.JPG'},
+          {path: '../static/images/male/AM04HAS.JPG'},
+          {path: '../static/images/male/AM05HAS.JPG'},
+          {path: '../static/images/male/AM06HAS.JPG'},
+          {path: '../static/images/male/AM07HAS.JPG'},
+          {path: '../static/images/male/AM08HAS.JPG'},
+          {path: '../static/images/male/AM09HAS.JPG'},
+          {path: '../static/images/male/AM10HAS.JPG'},
+          {path: '../static/images/male/AM11HAS.JPG'},
+          {path: '../static/images/male/AM12HAS.JPG'},
+          {path: '../static/images/male/AM13HAS.JPG'},
+          {path: '../static/images/male/AM14HAS.JPG'},
+          {path: '../static/images/male/AM15HAS.JPG'}
         ];
         
         //Extract the info of objects in the array
@@ -313,7 +313,7 @@
 
           //Instructions prompt
           var htmlContent = wrapperStart +
-            "<p> Your task in phase 1 is to <b>rate the attractiveness</b> of each of the faces that are presented. <br/>" + 
+            "<p> Your task in phase 1 is to <b>rate the attractiveness</b> of each of the faces that are presented. <br/><br/>" + 
             "Here is an image of a sample trial:<br/></p>" +
             "<img style='height:450px; width:800px; border:2px solid black; border-radius: 5px' src='../static/images/samplePhase1TrialImage.png'>" + 
             "<p>Slide the slider based on how attractive or unattractive you think they are. <br/><br/>" +
@@ -423,7 +423,7 @@
             frame_time: 500,
             sequence_reps: 50,
             prompt: wrapperStart +
-            '<br/> This is a demonstration of one trial. <br/>Press <b>Enter</b> when you are ready to start the experiment.' +
+            '<br/> This is a demonstration of two trials. <br/>Press <b>Enter</b> when you are ready to start the experiment.' +
             wrapperEnd,
             choices: [13]
           };
@@ -457,7 +457,7 @@
             ]
           };
           
-        }//End of makeInstructions3 function
+        }//End of makeInstructions2 function
         
         //Function to make the third instructions block
         function makeInstructions3(){
