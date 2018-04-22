@@ -42,10 +42,18 @@
     <body>
     </body>
     <script>
+    	
+    		/*
+    		Changes for patients:
+    		- Took out 3rd block instructions and survey
+    		- Inserted 2 empty blocks in its place
+    		- Changed instructions 1
+    		
+    		*/
     
         //Data switches
         var psiTurkIsOn = 0;   // 0: Test locally.  1: Test/Run on psiTurk
-        var savingLocally = 0; // 0: Nothing.       1: Download CSV file
+        var savingLocally = 1; // 0: Nothing.       1: Download CSV file
         var displayData = 0;   // 0: Nothing.       1: Display data on browser
         var savingToDatabase = 1;//Should be 1 when psiturkIsOn
         savingToDatabase = psiTurkIsOn ? 1 : savingToDatabase;//Safeguard to ensure that it saves to the database if psiturk is on
@@ -236,8 +244,10 @@
         timeline.push(prepForPhase2);
         timeline.push(instructionsBlock2);
         timeline.push(loopNode);
-        timeline.push(instructionsBlock3);
-        timeline.push(surveyBlock);
+        timeline.push(makeEmptyTrialBlock());
+        timeline.push(makeEmptyTrialBlock());
+        //timeline.push(instructionsBlock3);
+        //timeline.push(surveyBlock);
         timeline.push(debriefBlock);
         
         
@@ -297,7 +307,7 @@
           //Welcome Screen Text
           var welcomeScreenText = wrapperStart +
             "Welcome to the experiment!<br/><br/>" + 
-            "There will be three phases to this experiment, and you will receive separate instructions for each phase.<p></p>" +
+            "There will be two phases to this experiment, and you will receive separate instructions for each phase.<p></p>" +
             wrapperEnd;
             
           //Create the welcome screen
@@ -1323,6 +1333,18 @@
           
         }//End of makeSurvey
         
+        //Function to make empty stimuli blocks to fill in the trial_index
+        function makeEmptyTrialBlock(){
+        	
+        	return {
+        		type: 'call-function',
+        		func: function(){
+        			console.log('Empty block executed');
+        		}
+        	};
+        	
+        }//End of makeEmptyTrialBlock
+        
         //Function to make the debrief block
         function makeDebriefBlock(){
           
@@ -1330,7 +1352,8 @@
           var page1 =  wrapperStart +
             "Great work!<br/><br/>" + 
             "You have successfully completed the experiment.<br/><br/>" +
-            "Click on the 'Next' button to officially end the experiment and submit the HIT." +
+            "Thank you for your time and effort in participating.<br/><br/>" +
+            "Please inform the experimenter that you are done.<br/><br/>" +
             wrapperEnd;
             
           //Load it into a trial object and return it
@@ -1364,7 +1387,7 @@
           timeline: timeline,
           on_finish: function(){ //Execute this when the experiment finishes
             if(savingLocally){
-              jsPsych.data.get().localSave('csv','testSave.csv'); //Save the data locally in a .csv file
+              jsPsych.data.get().localSave('csv','subject.csv'); //Save the data locally in a .csv file
             }
             if(displayData){
               jsPsych.data.displayData(); //Display the data onto the browser screen
