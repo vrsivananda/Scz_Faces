@@ -1,0 +1,36 @@
+function plot3DScatter(plot3D_All, subjectColors)
+    
+    % Get the number of subjects
+    nSubjects = length(fieldnames(plot3D_All));
+    
+    % One figure for all subjects
+    figure;
+    
+    % For loop that goes through each subject
+    for i = 1:nSubjects
+        
+        % Get the current subject
+        currentSubject = plot3D_All.(['subject' num2str(i)]);
+        
+        % Get the color for the subject
+        currentColor = subjectColors(i,:);
+        
+        % Print the scatter of the current subject
+        scatter3(currentSubject.X,currentSubject.Y,currentSubject.Z,'MarkerEdgeColor',currentColor,'MarkerFaceColor',currentColor);
+        hold on;
+    
+    end % End of for loop
+    
+    hold off;
+    
+    % Axis labels
+    xlabel('zTarget-zNonTarget');
+    ylabel('zDistractor');
+    zlabel('% target chosen');
+    
+    % Axis limits
+    xlim([0 4]);
+    ylim([-3 3]);
+    zlim([0 1]);
+    
+end %End of function

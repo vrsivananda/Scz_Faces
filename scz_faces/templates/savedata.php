@@ -1,7 +1,7 @@
 <?php
 
 //This is to bypass the CORS issue
-//header('Access-Control-Allow-Origin: *'); //[sivaHack]
+header('Access-Control-Allow-Origin: *'); //[sivaHack]
 
 // Submit Data to mySQL database
 echo "Hello world!<br>";
