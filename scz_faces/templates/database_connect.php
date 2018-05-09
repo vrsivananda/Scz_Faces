@@ -1,6 +1,8 @@
 <?php
 
-$dbc = mysql_connect("localhost", "hothResearcher", "hothDatabaseA120!"); 
-mysql_select_db('onlineExperiments', $dbc);
+
+$dbc = mysql_connect("localhost", "bdLogin", "dbPassword"); 
+mysql_select_db('dbName', $dbc);
+
 
 ?>

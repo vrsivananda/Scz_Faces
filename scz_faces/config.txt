@@ -12,7 +12,8 @@ organization_name = University of California-Los Angeles
 browser_exclude_rule = mobile, tablet, touchcapable, MSIE
 
 [Database Parameters]
-database_url = mysql://hothResearcher:hothDatabaseA120!@hoth.engr.ucr.edu:3306/onlineExperiments
+database_url = mysql://databaseLogin:databasePassword!@serverAddress:3306/databaseTable
+
 table_name = turkdemo
 
 [Server Parameters]

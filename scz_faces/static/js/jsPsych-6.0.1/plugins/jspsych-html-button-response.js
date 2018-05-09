@@ -102,7 +102,9 @@ jsPsych.plugins["html-button-response"] = (function() {
 
     //show prompt if there is one
     if (trial.prompt !== null) {
-      html += trial.prompt;
+      //html += trial.prompt;
+      html += '<span style="text-align: center; font-size: 28px;<b>">'+trial.prompt+'</b></span>';
+      
     }
     display_element.innerHTML = html;
 
