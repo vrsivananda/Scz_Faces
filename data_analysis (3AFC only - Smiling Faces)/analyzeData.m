@@ -3,7 +3,10 @@
 clear;
 close all;
 
-% PARAMETERS
+% ----- PARAMETERS -----
+
+% Save ALL the figures
+saveFigure = 0;
 
 % Create the bins
 bins = [0, 0.1, 0.2, 0.4, 0.8, 1.6, 3.5];
@@ -11,9 +14,11 @@ bins = [0, 0.1, 0.2, 0.4, 0.8, 1.6, 3.5];
 % minimum percent correct before we toss
 minPercentCorrect = 0.55;
 
+% ----- Start reading the file -----
+
 % Create a path to the text file with all the subjects
-subjectOrPatient = 'patient';
-path=[subjectOrPatient 's.txt'];
+subjectOrPatient = 'subject';
+path=[subjectOrPatient 's_Round1.txt'];
 % Make an ID for the subject list file
 subjectListFileId=fopen(path);
 % Read in the number from the subject list
@@ -200,24 +205,30 @@ for i = 1:numberOfSubjects
                     % x, X, y, b, yReg
 
                     % Fit the psychometric functions
-                    [currentParamsValues_AFC_PE, currentBinCounter_AFC_PE, currentExitFlags_AFC_PE, currentPDevs_AFC_PE, currentConverged_AFC_PE]= fitAllPFs(dataStructure, bins, nValidSubjects, subjectOrPatient);
+                    [currentParamsValues_AFC_PE, currentBinCounter_AFC_PE, currentExitFlags_AFC_PE, currentPDevs_AFC_PE, currentConverged_AFC_PE]= fitAllPFs(dataStructure, bins, nValidSubjects, subjectOrPatient, saveFigure);
                     % ^ currentParamsValues in the form:
                     % [       AFC3_paramsValues;
                     %  highPE_3AFC_paramsValues;
                     %   lowPE_3AFC_paramsValues];
 
                     % Fit the psychometric function for Norm
-                    currentParamsValues_Norm = fitPsychometricFunction_Norm(dataStructure, nValidSubjects, subjectOrPatient);
+                    currentParamsValues_Norm = fitPsychometricFunction_Norm(dataStructure, nValidSubjects, subjectOrPatient, saveFigure);
 
                     % Fit the psychometric function for Norm and PE
-                    [currentParamValues_PE_Norm, currentChosenFaces_PE_Norm]= fitPsychometricFunction_PE_Norm(dataStructure, nValidSubjects, subjectOrPatient);
+                    [currentParamValues_PE_Norm, currentChosenFaces_PE_Norm]= fitPsychometricFunction_PE_Norm(dataStructure, nValidSubjects, subjectOrPatient, saveFigure);
 
                     % Extract data for logistic regression
                     currentSubjectLogRegData = extractLogRegData(dataStructure);
 
                     % Extract data for the 3d plot
                     currentSubject3DPlotData = extract3DPlotData(dataStructure, nValidSubjects, subjectOrPatient);
-
+                    
+                    % Extract z-score distribution data
+                    currentSubjectZScoreDistribution = extractZScoreDistribution(dataStructure);
+                    % ^ Data Structure with 2 fields: 
+                    % (1) M_zScores and
+                    % (2) F_zScores
+                    
                     % ---- Store the data ----
 
                     % Rating Difference
@@ -256,7 +267,10 @@ for i = 1:numberOfSubjects
 
                     % 3D Plot data
                     plot3D_All.(currentSubject) = currentSubject3DPlotData;
-
+                    
+                    % z-Score distribution data
+                    zScore_Distribution_M.(currentSubject) = currentSubjectZScoreDistribution.M_zScores;
+                    zScore_Distribution_F.(currentSubject) = currentSubjectZScoreDistribution.F_zScores;
 
                 end % End of Gatekeeper #4
 
@@ -285,35 +299,36 @@ subjectColors = rand(nValidSubjects,3);
 % ----- Plots and Analyses -----
 
 % Analyze the d's
-analyzeAndPlotDPrimes(dPrimes_All, subjectOrPatient);
+analyzeAndPlotDPrimes(dPrimes_All, subjectOrPatient, saveFigure);
 
 % Analyze the confidences
-analyzeAndPlotConfidence(AFC3_Confidence_All, subjectOrPatient);
+analyzeAndPlotConfidence(AFC3_Confidence_All, subjectOrPatient, saveFigure);
 
 % Plot the scatter plot of confidence vs d'
-scatterPlotConfidenceVsDPrime(dPrimes_All,AFC3_Confidence_All, subjectOrPatient);
+scatterPlotConfidenceVsDPrime(dPrimes_All,AFC3_Confidence_All, subjectOrPatient, saveFigure);
 
 % Analyze PE and Norm
-analyze_PE_Norm(chosenFaces_PE_Norm_All, subjectOrPatient);
+analyze_PE_Norm(chosenFaces_PE_Norm_All, subjectOrPatient, saveFigure);
 
 % Plot the data
-plotLinRegData(linReg_3AFC_All, 'BothPE',subjectColors, subjectOrPatient);
-plotLinRegData(linReg_3AFC_HighPE_All, 'HighPE', subjectColors, subjectOrPatient);
-plotLinRegData(linReg_3AFC_LowPE_All, 'LowPE', subjectColors, subjectOrPatient);
+plotLinRegData(linReg_3AFC_All, 'BothPE',subjectColors, subjectOrPatient, saveFigure);
+plotLinRegData(linReg_3AFC_HighPE_All, 'HighPE', subjectColors, subjectOrPatient, saveFigure);
+plotLinRegData(linReg_3AFC_LowPE_All, 'LowPE', subjectColors, subjectOrPatient, saveFigure);
 
 % Run the logisitc regression
-runLogisticRegression(logReg_3AFC, subjectOrPatient);
+runLogisticRegression(logReg_3AFC, subjectOrPatient, saveFigure);
 
 % Plot the average psychometric function
-plotAveragePF(paramsValues_AFC_PE_All, paramsValues_Norm_All, subjectOrPatient);
+plotAveragePF(paramsValues_AFC_PE_All, paramsValues_Norm_All, subjectOrPatient, saveFigure);
 
 % Plot the 3D Scatter Plot
-plot3DScatter(plot3D_All, subjectColors, subjectOrPatient);
+plot3DScatter(plot3D_All, subjectColors, subjectOrPatient, saveFigure);
 
 % Plot the phase1 performance vs phase2 performance
-plotPhase1Phase2Performance(phase1Phase2Performance_All, minPercentCorrect, subjectOrPatient);
+plotPhase1Phase2Performance(phase1Phase2Performance_All, minPercentCorrect, subjectOrPatient, saveFigure);
 
-
+% Plot the distribution of z-scores
+plotZScoreDistribution(zScore_Distribution_M, zScore_Distribution_F, subjectOrPatient, saveFigure);
 
 
 

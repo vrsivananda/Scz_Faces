@@ -1,7 +1,4 @@
-function analyzeAndPlotDPrimes(dPrimes_All ,subjectOrPatient)
-    
-    % Saving the figure
-    saveFigure = 1; 
+function analyzeAndPlotDPrimes(dPrimes_All, subjectOrPatient, saveFigure)
 
     % Parameters
     barColor = [0.7, 0.7, 0.7];

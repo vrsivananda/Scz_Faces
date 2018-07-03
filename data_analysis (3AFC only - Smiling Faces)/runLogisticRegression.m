@@ -1,7 +1,4 @@
-function runLogisticRegression(logReg_3AFC ,subjectOrPatient)
-    
-    % Saving the figure
-    saveFigure = 1; % For both figures
+function runLogisticRegression(logReg_3AFC, subjectOrPatient, saveFigure)
     
     % Get the number of subjects
     nSubjects = length(fieldnames(logReg_3AFC));
@@ -77,7 +74,7 @@ function runLogisticRegression(logReg_3AFC ,subjectOrPatient)
     if(saveFigure)
     
         % Create the file name and path to save
-        savingFileName = 'overall_LogisticRegression_zNonTarget-zDistractor' subjectOrPatient 's_.jpg';
+        savingFileName = ['overall_LogisticRegression_zNonTarget-zDistractor' subjectOrPatient 's_.jpg'];
         savingFilePath = [pwd '/Figures/Overall_' subjectOrPatient 's/' savingFileName];
 
         % Save the data

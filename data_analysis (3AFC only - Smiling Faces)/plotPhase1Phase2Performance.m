@@ -1,7 +1,4 @@
-function plotPhase1Phase2Performance(phase1Phase2Performance_All, minPercentCorrect ,subjectOrPatient)
-    
-    % Save the figure
-    saveFigure = 1;
+function plotPhase1Phase2Performance(phase1Phase2Performance_All, minPercentCorrect, subjectOrPatient, saveFigure)
     
     % Extract the data
     phase1_Mean = phase1Phase2Performance_All(:,1);

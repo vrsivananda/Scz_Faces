@@ -1,7 +1,4 @@
-function plot3DScatter(plot3D_All, subjectColors ,subjectOrPatient)
-    
-    % Save the figure
-    saveFigure = 1;
+function plot3DScatter(plot3D_All, subjectColors, subjectOrPatient, saveFigure)
     
     % Get the number of subjects
     nSubjects = length(fieldnames(plot3D_All));

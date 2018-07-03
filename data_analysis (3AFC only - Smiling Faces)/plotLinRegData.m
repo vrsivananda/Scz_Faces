@@ -1,7 +1,4 @@
-function plotLinRegData(linReg, PE, subjectColors ,subjectOrPatient)
-    
-    % Saving the figure
-    saveFigure = 1;
+function plotLinRegData(linReg, PE, subjectColors, subjectOrPatient, saveFigure)
     
     % --- Variables for group plots ---
     x_All = [];

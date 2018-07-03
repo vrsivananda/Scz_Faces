@@ -1,9 +1,6 @@
-function [paramValues, chosenFaces] = fitPsychometricFunction_PE_Norm(dataStructure, subjectNumber ,subjectOrPatient)
+function [paramValues, chosenFaces] = fitPsychometricFunction_PE_Norm(dataStructure, subjectNumber, subjectOrPatient, saveFigure)
     
     % ====== PARAMETERS BEGIN ======
-    
-    % Saving the figure
-    saveFigure = 0; 
     
     % Choose the a psychometric function 
     PF = @PAL_CumulativeNormal;

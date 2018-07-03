@@ -1,8 +1,4 @@
-function scatterPlotConfidenceVsDPrime(dPrimes_All,AFC2_Confidence_All ,subjectOrPatient)
-    
-    % Saving the figure
-    saveFigure = 1;
-
+function scatterPlotConfidenceVsDPrime(dPrimes_All,AFC2_Confidence_All, subjectOrPatient, saveFigure)
     % --- Load in variables for easy handling ---
     
     % d'

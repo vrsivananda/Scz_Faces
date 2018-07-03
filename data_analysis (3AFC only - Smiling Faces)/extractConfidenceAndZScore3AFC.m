@@ -30,7 +30,7 @@ function output = extractConfidenceAndZScore3AFC(dataStructure)
     highPE_3AFC_indices = intersect(AFC3_indices,highPE_indices);
     lowPE_3AFC_indices = intersect(AFC3_indices,lowPE_indices);
 
-    % Get the difference in zScores
+    % Get the difference in zScores (between the target and the non-target)
     highPE_3AFC_zScoreDiff = dataStructure.zScoreDiff(highPE_3AFC_indices);
     lowPE_3AFC_zScoreDiff = dataStructure.zScoreDiff(lowPE_3AFC_indices);
     

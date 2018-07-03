@@ -1,13 +1,10 @@
-function plotAveragePF(paramsValues_All, paramsValues_Norm_All ,subjectOrPatient)
+function plotAveragePF(paramsValues_All, paramsValues_Norm_All, subjectOrPatient, saveFigure)
     
     % ========== PARAMETERS BEGIN ==========
     
     % The kind of average function to use
     useAverageParameters = 1;
     useBoundedline = 1;
-    
-    % Save the figure
-    saveFigure = 1; % For all figures
     
     % Choose the a psychometric function 
     PF = @PAL_CumulativeNormal;

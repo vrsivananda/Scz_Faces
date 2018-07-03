@@ -1,4 +1,4 @@
-function analyze_PE_Norm(chosenFaces_PE_Norm_All ,subjectOrPatient)
+function analyze_PE_Norm(chosenFaces_PE_Norm_All, subjectOrPatient, saveFigure)
     
     % chosenFaces_PE_Norm_All in the form:
     % [targetCounter_highPE_highNorm, nontargetCounter_highPE_highNorm, distractorCounter_highPE_highNorm, mean(confidence_highPE_highNorm_Array); ...
@@ -6,9 +6,6 @@ function analyze_PE_Norm(chosenFaces_PE_Norm_All ,subjectOrPatient)
     %  targetCounter_lowPE_highNorm , nontargetCounter_lowPE_highNorm , distractorCounter_lowPE_highNorm , mean(confidence_lowPE_highNorm_Array) ; ...
     %  targetCounter_lowPE_lowNorm  , nontargetCounter_lowPE_lowNorm  , distractorCounter_lowPE_lowNorm  , mean(confidence_lowPE_lowNorm_Array)   ]
     % ^ Subjects in the 3rd dimension
-    
-    % Saving the figure
-    saveFigure = 1;
     
     % Parameters
     barColor = [0.7, 0.7, 0.7];
