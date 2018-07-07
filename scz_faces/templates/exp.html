@@ -44,10 +44,10 @@
     <script>
     
         //Data switches
-        var psiTurkIsOn = 0;   // 0: Test locally.  1: Test/Run on psiTurk
+        var psiTurkIsOn = 1;   // 0: Test locally.  1: Test/Run on psiTurk
         var savingLocally = 0; // 0: Nothing.       1: Download CSV file
         var displayData = 0;   // 0: Nothing.       1: Display data on browser
-        var savingToDatabase = 0;//Should be 1 when psiturkIsOn
+        var savingToDatabase = 1;//Should be 1 when psiturkIsOn
         savingToDatabase = psiTurkIsOn ? 1 : savingToDatabase;//Safeguard to ensure that it saves to the database if psiturk is on
         
         var username = '';     // Username for psiturk server
@@ -841,7 +841,7 @@
             var highPEFemaleHighNormTriplet = sampleFrom(highPEFemaleArray,3);
             
             //--Low PE && High Norm--
-            //Select all three from z-score < 0 (i.e. lowPE Array)
+            //Select all three from z-score < 0.5 (i.e. lowPE Array)
             //High or Low Norm will be determined during analysis. Variable names here are merely filler and for counterbalancing
             var lowPEMaleHighNormTriplet = sampleFrom(lowPEMaleArray,3);
             var lowPEFemaleHighNormTriplet = sampleFrom(lowPEFemaleArray,3);
@@ -850,14 +850,16 @@
             //---- Low Norm ----
             
             //--High PE && Low Norm--
-            //Select two from z-score > 0 and one from z-score < 0
-            var highPEMaleLowNormTriplet = sampleFrom(highPEMaleArray,2).concat(sampleFrom(lowPEMaleArray,1));
-            var highPEFemaleLowNormTriplet = sampleFrom(highPEFemaleArray,2).concat(sampleFrom(lowPEFemaleArray,1));
+            //Select two from z-score > 0 and one from z-score < 0.5
+            //var highPEMaleLowNormTriplet = sampleFrom(highPEMaleArray,2).concat(sampleFrom(lowPEMaleArray,1));
+            //var highPEFemaleLowNormTriplet = sampleFrom(highPEFemaleArray,2).concat(sampleFrom(lowPEFemaleArray,1));
+            var highPEMaleLowNormTriplet = sampleFrom(highPEMaleArray,2,lowPEMaleArray,1);
+            var highPEFemaleLowNormTriplet = sampleFrom(highPEFemaleArray,2,lowPEFemaleArray,1);
             
             //--Low PE && Low Norm--
-            //Select all three from z-score < 0 (i.e. lowPE Array)
+            //Select all three from z-score < 0.5 (i.e. lowPE Array)
             //High or Low Norm will be determined during analysis. Variable names here are merely filler and for counterbalancing
-            var lowPEMaleHighLowTriplet = sampleFrom(lowPEMaleArray,3);
+            var lowPEMaleLowNormTriplet = sampleFrom(lowPEMaleArray,3);
             var lowPEFemaleLowNormTriplet = sampleFrom(lowPEFemaleArray,3);
             
             
@@ -870,7 +872,7 @@
             var lowPEFemaleHighNormTrial  = makeTrialFromTriplet(lowPEFemaleHighNormTriplet);
             var highPEMaleLowNormTrial    = makeTrialFromTriplet(highPEMaleLowNormTriplet);
             var highPEFemaleLowNormTrial  = makeTrialFromTriplet(highPEFemaleLowNormTriplet);
-            var lowPEMaleHighLowTrial     = makeTrialFromTriplet(lowPEMaleHighLowTriplet);
+            var lowPEMaleLowNormTrial     = makeTrialFromTriplet(lowPEMaleLowNormTriplet);
             var lowPEFemaleLowNormTrial   = makeTrialFromTriplet(lowPEFemaleLowNormTriplet);
             
             //=======  Push in the trials into the AFC2Array  =======
@@ -881,7 +883,7 @@
             AFC3Array.push(lowPEFemaleHighNormTrial);
             AFC3Array.push(highPEMaleLowNormTrial);
             AFC3Array.push(highPEFemaleLowNormTrial);
-            AFC3Array.push(lowPEMaleHighLowTrial);
+            AFC3Array.push(lowPEMaleLowNormTrial);
             AFC3Array.push(lowPEFemaleLowNormTrial);
             
           }//End of for loop
@@ -891,6 +893,56 @@
           
         }//End of make3AFCTrials
         
+        //Function to sample a number of face objects from a PEArray and checks their z-score are all different
+        function sampleFrom(){
+          
+          //Declare an array to hold the samples
+          var sample = [];
+          
+          //Declare an array to hold the z-scores
+          var zScores = [];
+          
+          //For loop that goes through the pairs of arguments
+          //First element is relevantArray, second element is the number to sample
+          for(var i = 0; i < arguments.length-1; i=i+2){
+            
+            var relevantArray =  arguments[i];
+            var relevantNumber = arguments[i+1];
+            
+            //Get the current sample
+            var currentSample = jsPsych.randomization.sampleWithoutReplacement(relevantArray, relevantNumber);
+            
+            //Sample from the current array
+            sample = sample.concat(currentSample);
+          }
+          
+          //For loop that goes through the samples array to get their zScores
+          for(var i = 0; i < sample.length; i++){
+            //Push the zScores of the sample into the zScore array
+            zScores.push(sample[i].zScore);
+          }
+          
+          //Create an array of unique zscores
+          uniqueZScores = [...new Set(zScores)];
+          
+          //Get the unique zScores and check if it's the same length as the zScores
+          if(uniqueZScores.length === zScores.length){
+            return sample;
+          }
+          //Else we recursively resample according to the length of the argument
+          else{
+            if(arguments.length === 4){
+              return sampleFrom(arguments[0], arguments[1], arguments[2], arguments[3]);
+            }
+            else if(arguments.length === 2){
+              return sampleFrom(arguments[0], arguments[1]);
+            }
+          }
+          
+          
+        }//End of sampleFrom
+        
+        /*
         //Function to sample a number of face objects from a PEArray and checks their z-score are all different
         function sampleFrom(relevantArray, n){
           
@@ -941,7 +993,7 @@
           }//End of outer if-else (if n === 1)
           
         }//End of sampleFrom
-        
+        */
         //Function to make the image html tag
         function makeImageHTML(path){
           
