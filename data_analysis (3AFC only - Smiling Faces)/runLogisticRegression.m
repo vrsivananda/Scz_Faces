@@ -143,7 +143,7 @@ function runLogisticRegression(logReg_3AFC, subjectOrPatient, saveFigure)
     errorbar([1,2,3,4],y,[X0_SEM, X1_SEM, X2_SEM, X3_SEM],'.');
     
     % Format the graph
-    set(gca, 'XTickLabel', {'constant', 'zTarget', 'zNonTarget', 'zNonTarget-zDistractor'});
+    set(gca, 'XTickLabel', {'constant', 'zTarget', 'zNonTarget', 'zDistractor'});
     xlim([minX maxX]);
     ylim([-5 5]);
     ylabel('Coefficient value');

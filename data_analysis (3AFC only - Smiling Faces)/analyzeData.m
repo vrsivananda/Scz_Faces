@@ -12,7 +12,7 @@ saveFigure = 0;
 bins = [0, 0.1, 0.2, 0.4, 0.8, 1.6, 3.5];
 
 % minimum percent correct before we toss
-minPercentCorrect = 0.55;
+minPercentCorrect = 0.45;
 
 % ----- Start reading the file -----
 

@@ -42,6 +42,8 @@
     <body>
     </body>
     <script>
+      
+      
     
         //Data switches
         var psiTurkIsOn = 1;   // 0: Test locally.  1: Test/Run on psiTurk
@@ -82,6 +84,8 @@
         //nTrials2AFC = 104; //Must be multiple of 4 for counterbalancing gender & PE
         nTrials3AFC = 208; //Must be multiple of 8 for counterbalancing gender, PE & norm
         nFacesPerGender = 10; //How many faces to keep from each gender for the AFC trials
+        lowPECutoff = 0.5;
+        highPECutoff  = 0;
         
         
         //Global variables to be filled in by functions below
@@ -98,6 +102,9 @@
         
         //Variable to keep track of whether the subject answered all the phase1 questions below 1s
         var subjectAnsweredAllPhase1Below1Second = true; //Changed in the on_finish function of the phase 1 questions
+        
+        //Counter to count how many trials have all 3 faces where the z-score is between 0 and 0.5
+        var clash_counter = 0;
         
         //Wrappers for font sizes
         var wrapperStart = "<div style='font-size: 24px; font-family: Helvetica, sans-serif'>";
@@ -1026,11 +1033,11 @@
             var currentFaceObject = relevantArray[i];
             
             //If we want the high PE and the z-score of the current face is > 0
-            if(highOrLow === "high" && currentFaceObject.zScore >= 0){
+            if(highOrLow === "high" && currentFaceObject.zScore >= highPECutoff){
               tempArray.push(currentFaceObject);
             }
             //If we want the low PE and the z-score of the current face is < 0
-            else if (highOrLow === "low" && currentFaceObject.zScore <= 0.5){
+            else if (highOrLow === "low" && currentFaceObject.zScore <= lowPECutoff){
               tempArray.push(currentFaceObject);
             }
             
@@ -1049,10 +1056,10 @@
           var face2 = pair[1];
           
           //Determine if highPE or lowPE
-          if(face1.zScore < 0){
+          if(face1.zScore < lowPECutoff){
             var PE = "low";
           }
-          else if(face1.zScore > 0){
+          else if(face1.zScore > highPECutoff){
             var PE = "high";
           }
           
@@ -1134,12 +1141,20 @@
           triplet[1].faceType = "non-target";
           triplet[2].faceType = "distractor";
           
-          //Determine if highPE or lowPE
-          if(triplet[0].zScore < 0){
-            var PE = "low";
+          if(triplet[0].zScore <= lowPECutoff && triplet[0].zScore >= highPECutoff &&
+             triplet[1].zScore <= lowPECutoff && triplet[1].zScore >= highPECutoff &&
+             triplet[2].zScore <= lowPECutoff && triplet[2].zScore >= highPECutoff){
+              clash_counter += 1;
+           
           }
-          else if(triplet[0].zScore > 0){
+          
+          //Determine if highPE or lowPE
+          //(If 0 < all 3 faces < 0.5)
+          if(triplet[0].zScore > lowPECutoff && triplet[1].zScore > lowPECutoff && triplet[2].zScore > lowPECutoff){
             var PE = "high";
+          }
+          else {
+            var PE = "low";
           }
           
           //Shuffle the triplet to randomize the faces
@@ -1369,6 +1384,10 @@
               
               //Add the counter data to the data object
               data.PDIScore = PDICounter;
+              
+              //Add the clash_counter to the data object.
+              //(It's just convenient to add this here)
+              data.clashes = clash_counter;
               
             }//End of on_finish
           };//End of return

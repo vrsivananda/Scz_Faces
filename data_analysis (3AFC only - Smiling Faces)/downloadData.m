@@ -12,17 +12,17 @@ close all;
 javaaddpath('mysql-connector-java-5.1.42-bin.jar');
 
 % Create a connection object by connecting to our SQL database.
-databaseUsername = 'hothResearcher';
-databasePassword = 'hothDatabaseA120!';
-databaseName = 'onlineExperiments';
-tableName = 'Scz_Faces';
-serverAddess = 'hoth.engr.ucr.edu';
+databaseUsername = '';
+databasePassword = '';
+databaseName = '';
+tableName = '';
+serverAddess = '';
 conn = database(databaseName,databaseUsername,databasePassword,'Vendor','MySQL',...
     'Server',serverAddess);
 
 
 % Load a text file that lists all of the subjects.
-path='patients.txt';
+path='subjects_Round1.txt';
 % Make an ID for the subject list file
 subjectListFileId=fopen(path);
 % Read in the number from the subject list
