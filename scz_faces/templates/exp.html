@@ -1149,12 +1149,23 @@
           }
           
           //Determine if highPE or lowPE
-          //(If 0 < all 3 faces < 0.5)
-          if(triplet[0].zScore > lowPECutoff && triplet[1].zScore > lowPECutoff && triplet[2].zScore > lowPECutoff){
+          //If all  faces are above the highPE cutoff, then they are highPE
+          //(Trials with all 3 faces between the low and highPE cutoffs are considered highPE)
+          //HighPE High Norm
+          if(triplet[0].zScore > highPECutoff && triplet[1].zScore > highPECutoff && triplet[2].zScore > highPECutoff){
             var PE = "high";
           }
-          else {
+          //HighPE Low Norm
+          else if(triplet[0].zScore > highPECutoff && triplet[1].zScore > highPECutoff && triplet[2].zScore < lowPECutoff){
+            var PE = "high";
+          }
+          //Low PE both High and Low Norm
+          else if(triplet[0].zScore < lowPECutoff && triplet[1].zScore < lowPECutoff && triplet[2].zScore < lowPECutoff){
             var PE = "low";
+          }
+          //Else we have a problem
+          else{
+            alert("Problem with determining PE.");
           }
           
           //Shuffle the triplet to randomize the faces
