@@ -58,9 +58,9 @@
         var savingToDatabase = 1;//Should be 1 when psiturkIsOn
         savingToDatabase = psiTurkIsOn ? 1 : savingToDatabase;//Safeguard to ensure that it saves to the database if psiturk is on
         
-        var username = 'hothResearcher';     // Username for psiturk server
-        var tableName = 'Scz_Faces';    // MySQL Table Name 
-        var folderName = 'scz_faces';   // Folder containing the experiment
+        var username = '';     // Username for psiturk server
+        var tableName = '';    // MySQL Table Name 
+        var folderName = '';   // Folder containing the experiment
         
         //Get the workerID, etc. if we are saving to Database
         if(savingToDatabase){
@@ -90,6 +90,8 @@
         //nTrials2AFC = 104; //Must be multiple of 4 for counterbalancing gender & PE
         nTrials3AFC = 208; //Must be multiple of 8 for counterbalancing gender, PE & norm
         nFacesPerGender = 10; //How many faces to keep from each gender for the AFC trials
+        lowPECutoff = 0.5;
+        highPECutoff  = 0;
         
         
         //Global variables to be filled in by functions below
@@ -788,7 +790,11 @@
               highPEFemaleArray.length < 3 ||
               lowPEMaleArray.length    < 3 ||
               lowPEFemaleArray.length  < 3 ||
-              subjectAnsweredAllPhase1Below1Second){
+              allFacesBetweenCutoffs(highPEMaleArray)   ||
+              allFacesBetweenCutoffs(highPEFemaleArray) ||
+              allFacesBetweenCutoffs(lowPEMaleArray)    ||
+              allFacesBetweenCutoffs(lowPEFemaleArray)  ||
+              subjectAnsweredAllPhase1Below1Second ){
            
            //Kill the experiment
            jsPsych.endExperiment("Thank you for participating! <br/> Your responses in phase 1 make you ineligible to complete phase 2. <br/> Please email <b>uclaqualialab@gmail.com</b> with your WorkerID to receive partial compensation.");
@@ -796,6 +802,38 @@
           }//End of if
           
         }//End of checkPEArrays
+        
+        //Function to check if all faces in the array have z-scores that are between the cutoffs (and hence cannot be used)
+        function allFacesBetweenCutoffs(relevantArray){
+                    
+          //For loop that goes through each face to check if it's in between the two PE Cutoffs
+          for(var faceObject of relevantArray){
+            //If one of the faces is out of the range between highPECutoff and lowPECutoff, then we return false 
+            if(faceObject.zScore > lowPECutoff || faceObject.zScore < highPECutoff){
+              return false;
+            }
+          }//End of faceObject for loop
+          
+          //If all of the faces are between the two cutoff values, then we return true
+          return true;
+          
+        }//End of allFacesBetweenCutoffs
+        
+        //Function to check if all faces in the array have z-scores that are between the cutoffs (and hence cannot be used)
+        function allValuesBetweenCutoffs(array){
+                    
+          //For loop that goes through each face to check if it's in between the two PE Cutoffs
+          for(var zScore of array){
+            //If one of the faces is out of the range between highPECutoff and lowPECutoff, then we return false 
+            if(zScore > lowPECutoff || zScore < highPECutoff){
+              return false;
+            }
+          }//End of faceObject for loop
+          
+          //If all of the faces are between the two cutoff values, then we return true
+          return true;
+          
+        }//End of allFacesBetweenCutoffs
         
         //Function to make the 2AFC trials, returns an array of individual trials
         function make2AFCTrials(){
@@ -861,8 +899,10 @@
             
             //--High PE && Low Norm--
             //Select two from z-score > 0 and one from z-score < 0
-            var highPEMaleLowNormTriplet = sampleFrom(highPEMaleArray,2).concat(sampleFrom(lowPEMaleArray,1));
-            var highPEFemaleLowNormTriplet = sampleFrom(highPEFemaleArray,2).concat(sampleFrom(lowPEFemaleArray,1));
+            //var highPEMaleLowNormTriplet = sampleFrom(highPEMaleArray,2).concat(sampleFrom(lowPEMaleArray,1));
+            //var highPEFemaleLowNormTriplet = sampleFrom(highPEFemaleArray,2).concat(sampleFrom(lowPEFemaleArray,1));
+            var highPEMaleLowNormTriplet = sampleFrom(highPEMaleArray,2,lowPEMaleArray,1);
+            var highPEFemaleLowNormTriplet = sampleFrom(highPEFemaleArray,2,lowPEFemaleArray,1);
             
             //--Low PE && Low Norm--
             //Select all three from z-score < 0 (i.e. lowPE Array)
@@ -901,56 +941,65 @@
           
         }//End of make3AFCTrials
         
+        
+        
         //Function to sample a number of face objects from a PEArray and checks their z-score are all different
-        function sampleFrom(relevantArray, n){
+        function sampleFrom(){
           
-          //Get a sample from the array without replacement
-          var sample = jsPsych.randomization.sampleWithoutReplacement(relevantArray,n);
+          //Declare an array to hold the samples
+          var sample = [];
           
-          //If we are just choosing one, then we just return the array of a single object
-          if(n === 1){
+          //Declare an array to hold the z-scores
+          var zScores = [];
+          
+          //For loop that goes through the pairs of arguments
+          //First element is relevantArray, second element is the number to sample
+          for(var i = 0; i < arguments.length-1; i=i+2){
+            
+            var relevantArray =  arguments[i];
+            var relevantNumber = arguments[i+1];
+            
+            //Get the current sample
+            var currentSample = jsPsych.randomization.sampleWithoutReplacement(relevantArray, relevantNumber);
+            
+            //If this is the third argument, then we are looking for a low PE distractor for a highPE trial.
+            //So we make sure that we draw a sample where the zScore < highPE cutoff to make sure that it is a low distractor
+            if(i == 2){
+              while(currentSample[0].zScore > highPECutoff){
+                currentSample = jsPsych.randomization.sampleWithoutReplacement(relevantArray, relevantNumber);
+              }
+            }
+            
+            //Sample from the current array
+            sample = sample.concat(currentSample);
+          }
+          
+          //For loop that goes through the samples array to get their zScores
+          for(var i = 0; i < sample.length; i++){
+            //Push the zScores of the sample into the zScore array
+            zScores.push(sample[i].zScore);
+          }
+          
+          //Create an array of unique zscores
+          uniqueZScores = [...new Set(zScores)];
+          
+          //Get the unique zScores and check if it's the same length as the zScores
+          //Make sure that all 3 faces are also not within the 3 PE cutoffs
+          if( (uniqueZScores.length === zScores.length) && (!allValuesBetweenCutoffs(uniqueZScores)) ){
             return sample;
           }
-          //Else we check to make sure that they all have different z-scores
+          //Else we recursively resample according to the length of the argument
           else{
-            
-            //Flag to check if it is a duplicate
-            var duplicate = false;
-            
-            //Array to hold the z-scores
-            var zScoresArray = [];
-            
-            //Load in all the z-scores
-            for(var i = 0; i < sample.length; i++){
-              zScoresArray.push(sample[i].zScore);
+            if(arguments.length === 4){
+              return sampleFrom(arguments[0], arguments[1], arguments[2], arguments[3]);
             }
-            
-            //Sort the array based on z-score
-            sample = sample.sort(function(a,b){return (b.zScore - a.zScore); });
-            
-            //Loop through the array to see if any of them are duplicates
-            for(var i = 0; i < sample.length-1; i++){
-              //If the current zScore is the same as the next zScore, then we know that there is a duplicate
-              if(sample[i].zScore === sample[i+1].zScore){
-                //Set the flag to true
-                duplicate = true;
-              }
-            }//End of for loop
-            
-            //If it is a duplicate
-            if(duplicate){
-              //Recusively call this function again to get another sample and check again
-              return sampleFrom(relevantArray,n);
+            else if(arguments.length === 2){
+              return sampleFrom(arguments[0], arguments[1]);
             }
-            //Else we have found a distinct sample
-            else{
-              //Return the sample
-              return jsPsych.randomization.shuffle(sample);
-            }//End of inner if-else
-            
-          }//End of outer if-else (if n === 1)
+          }
           
         }//End of sampleFrom
+        
         
         //Function to make the image html tag
         function makeImageHTML(path){
@@ -984,11 +1033,11 @@
             var currentFaceObject = relevantArray[i];
             
             //If we want the high PE and the z-score of the current face is > 0
-            if(highOrLow === "high" && currentFaceObject.zScore > 0){
+            if(highOrLow === "high" && currentFaceObject.zScore >= highPECutoff){
               tempArray.push(currentFaceObject);
             }
-            //Else if we want the low PE and the z-score of the current face is < 0
-            else if (highOrLow === "low" && currentFaceObject.zScore < 0){
+            //If we want the low PE and the z-score of the current face is < 0
+            else if (highOrLow === "low" && currentFaceObject.zScore <= lowPECutoff){
               tempArray.push(currentFaceObject);
             }
             
@@ -1092,12 +1141,31 @@
           triplet[1].faceType = "non-target";
           triplet[2].faceType = "distractor";
           
+          if(triplet[0].zScore <= lowPECutoff && triplet[0].zScore >= highPECutoff &&
+             triplet[1].zScore <= lowPECutoff && triplet[1].zScore >= highPECutoff &&
+             triplet[2].zScore <= lowPECutoff && triplet[2].zScore >= highPECutoff){
+              clash_counter += 1;
+           
+          }
+          
           //Determine if highPE or lowPE
-          if(triplet[0].zScore < 0){
+          //If all  faces are above the highPE cutoff, then they are highPE
+          //(Trials with all 3 faces between the low and highPE cutoffs are considered highPE)
+          //HighPE High Norm
+          if(triplet[0].zScore > highPECutoff && triplet[1].zScore > highPECutoff && triplet[2].zScore > highPECutoff){
+            var PE = "high";
+          }
+          //HighPE Low Norm
+          else if(triplet[0].zScore > highPECutoff && triplet[1].zScore > highPECutoff && triplet[2].zScore < lowPECutoff){
+            var PE = "high";
+          }
+          //Low PE both High and Low Norm
+          else if(triplet[0].zScore < lowPECutoff && triplet[1].zScore < lowPECutoff && triplet[2].zScore < lowPECutoff){
             var PE = "low";
           }
-          else if(triplet[0].zScore > 0){
-            var PE = "high";
+          //Else we have a problem
+          else{
+            alert("Problem with determining PE.");
           }
           
           //Shuffle the triplet to randomize the faces
@@ -1194,7 +1262,7 @@
             (choice === 2 && data.faceType3 === "target") 
             ){
             //Add to the data to the data object to be saved
-            data.correct = true;
+            data.correct = 1;
             data.chosenFace = "target";
           }
           //Else if they chose the non-target
@@ -1204,7 +1272,7 @@
             (choice === 2 && data.faceType3 === "non-target") 
             ){
             //Add to the data to the data object to be saved
-            data.correct = false;
+            data.correct = 0;
             data.chosenFace = "non-target";
           }
           //Else if they chose the distractor
@@ -1214,7 +1282,7 @@
             (choice === 2 && data.faceType3 === "distractor") 
             ){
             //Add to the data to the data object to be saved
-            data.correct = false;
+            data.correct = 0;
             data.chosenFace = "distractor";
           }
           

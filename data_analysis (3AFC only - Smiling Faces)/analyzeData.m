@@ -14,11 +14,15 @@ bins = [0, 0.1, 0.2, 0.4, 0.8, 1.6, 3.5];
 % minimum percent correct before we toss
 minPercentCorrect = 0.45;
 
+% PE cutoffs
+highPECutoff = 0;
+lowPECutoff = 0.5;
+
 % ----- Start reading the file -----
 
 % Create a path to the text file with all the subjects
 subjectOrPatient = 'subject';
-path=[subjectOrPatient 's_Round1.txt'];
+path=[subjectOrPatient 's_testing.txt'];
 % Make an ID for the subject list file
 subjectListFileId=fopen(path);
 % Read in the number from the subject list
@@ -93,10 +97,16 @@ for i = 1:numberOfSubjects
         % Else we move to gatekeeper #3  
         else
             
-    
+            % Process the PE conditions of the data structure based on how
+            % we want to categorize the trials
+            [dataStructure, nLowPE, nHighPE] = categorizePE(dataStructure, lowPECutoff, highPECutoff);
+            
+            nLowPE_array(i) = nLowPE;
+            nHighPE_array(i) = nHighPE;
+            
             % Extract the info for plotting the phase1 performance
             currentPhase1Performance = extractPhase1Performance(dataStructure);
-            % In the form: [differenceMean, differenceSD]
+            % ^ In the form: [differenceMean, differenceSD]
 
             % Check how many trials the subject answered 100 as their response
 
@@ -286,7 +296,7 @@ end % End of for loop that loops through each subject
 %%%%%%%% Your analysis here %%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%close all;
+close all;
 
 % ----- Make Subject Colors -----
 

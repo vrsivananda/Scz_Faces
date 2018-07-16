@@ -770,6 +770,7 @@
           lowPEMaleArray = makePEArray(male_stimuli,"low"); //Global variable
           lowPEFemaleArray = makePEArray(female_stimuli,"low"); //Global variable
           
+          console.log("------------------------");
           console.log("highPEMaleArray:");
           console.log(JSON.parse(JSON.stringify(highPEMaleArray)));
           console.log("highPEFemaleArray:");
@@ -780,12 +781,19 @@
           console.log(JSON.parse(JSON.stringify(lowPEFemaleArray)));
           
                     
-          //If any of the four arrays have less than 3 elements or if the subject answered all phase 1 questions below 1 second, then we kill the experiment
+          //If any of the four arrays have less than 3 elements, or 
+          // if all faces in the any of the 4 arrays are between the cutoff points, or
+          // if the subject answered all phase 1 questions below 1 second,
+          // then we kill the experiment
           if( highPEMaleArray.length   < 3 ||
               highPEFemaleArray.length < 3 ||
               lowPEMaleArray.length    < 3 ||
               lowPEFemaleArray.length  < 3 ||
-              subjectAnsweredAllPhase1Below1Second){
+              allFacesBetweenCutoffs(highPEMaleArray)   ||
+              allFacesBetweenCutoffs(highPEFemaleArray) ||
+              allFacesBetweenCutoffs(lowPEMaleArray)    ||
+              allFacesBetweenCutoffs(lowPEFemaleArray)  ||
+              subjectAnsweredAllPhase1Below1Second ){
            
            //Kill the experiment
            jsPsych.endExperiment("Thank you for participating! <br/> Your responses in phase 1 make you ineligible to complete phase 2. <br/> Please email <b>ucrneuralcomputation@gmail.com</b> with your WorkerID to receive partial compensation.");
@@ -793,6 +801,38 @@
           }//End of if
           
         }//End of checkPEArrays
+        
+        //Function to check if all faces in the array have z-scores that are between the cutoffs (and hence cannot be used)
+        function allFacesBetweenCutoffs(relevantArray){
+                    
+          //For loop that goes through each face to check if it's in between the two PE Cutoffs
+          for(var faceObject of relevantArray){
+            //If one of the faces is out of the range between highPECutoff and lowPECutoff, then we return false 
+            if(faceObject.zScore > lowPECutoff || faceObject.zScore < highPECutoff){
+              return false;
+            }
+          }//End of faceObject for loop
+          
+          //If all of the faces are between the two cutoff values, then we return true
+          return true;
+          
+        }//End of allFacesBetweenCutoffs
+        
+        //Function to check if all faces in the array have z-scores that are between the cutoffs (and hence cannot be used)
+        function allValuesBetweenCutoffs(array){
+                    
+          //For loop that goes through each face to check if it's in between the two PE Cutoffs
+          for(var zScore of array){
+            //If one of the faces is out of the range between highPECutoff and lowPECutoff, then we return false 
+            if(zScore > lowPECutoff || zScore < highPECutoff){
+              return false;
+            }
+          }//End of faceObject for loop
+          
+          //If all of the faces are between the two cutoff values, then we return true
+          return true;
+          
+        }//End of allFacesBetweenCutoffs
         
         //Function to make the 2AFC trials, returns an array of individual trials
         function make2AFCTrials(){
@@ -857,7 +897,7 @@
             //---- Low Norm ----
             
             //--High PE && Low Norm--
-            //Select two from z-score > 0 and one from z-score < 0.5
+            //Select two from z-score > 0 and one from z-score < 0
             //var highPEMaleLowNormTriplet = sampleFrom(highPEMaleArray,2).concat(sampleFrom(lowPEMaleArray,1));
             //var highPEFemaleLowNormTriplet = sampleFrom(highPEFemaleArray,2).concat(sampleFrom(lowPEFemaleArray,1));
             var highPEMaleLowNormTriplet = sampleFrom(highPEMaleArray,2,lowPEMaleArray,1);
@@ -919,6 +959,14 @@
             //Get the current sample
             var currentSample = jsPsych.randomization.sampleWithoutReplacement(relevantArray, relevantNumber);
             
+            //If this is the third argument, then we are looking for a low PE distractor for a highPE trial.
+            //So we make sure that we draw a sample where the zScore < highPE cutoff to make sure that it is a low distractor
+            if(i == 2){
+              while(currentSample[0].zScore > highPECutoff){
+                currentSample = jsPsych.randomization.sampleWithoutReplacement(relevantArray, relevantNumber);
+              }
+            }
+            
             //Sample from the current array
             sample = sample.concat(currentSample);
           }
@@ -933,7 +981,8 @@
           uniqueZScores = [...new Set(zScores)];
           
           //Get the unique zScores and check if it's the same length as the zScores
-          if(uniqueZScores.length === zScores.length){
+          //Make sure that all 3 faces are also not within the 3 PE cutoffs
+          if( (uniqueZScores.length === zScores.length) && (!allValuesBetweenCutoffs(uniqueZScores)) ){
             return sample;
           }
           //Else we recursively resample according to the length of the argument
@@ -946,61 +995,9 @@
             }
           }
           
-          
         }//End of sampleFrom
         
-        /*
-        //Function to sample a number of face objects from a PEArray and checks their z-score are all different
-        function sampleFrom(relevantArray, n){
-          
-          //Get a sample from the array without replacement
-          var sample = jsPsych.randomization.sampleWithoutReplacement(relevantArray,n);
-          
-          //If we are just choosing one, then we just return the array of a single object
-          if(n === 1){
-            return sample;
-          }
-          //Else we check to make sure that they all have different z-scores
-          else{
-            
-            //Flag to check if it is a duplicate
-            var duplicate = false;
-            
-            //Array to hold the z-scores
-            var zScoresArray = [];
-            
-            //Load in all the z-scores
-            for(var i = 0; i < sample.length; i++){
-              zScoresArray.push(sample[i].zScore);
-            }
-            
-            //Sort the array based on z-score
-            sample = sample.sort(function(a,b){return (b.zScore - a.zScore); });
-            
-            //Loop through the array to see if any of them are duplicates
-            for(var i = 0; i < sample.length-1; i++){
-              //If the current zScore is the same as the next zScore, then we know that there is a duplicate
-              if(sample[i].zScore === sample[i+1].zScore){
-                //Set the flag to true
-                duplicate = true;
-              }
-            }//End of for loop
-            
-            //If it is a duplicate
-            if(duplicate){
-              //Recusively call this function again to get another sample and check again
-              return sampleFrom(relevantArray,n);
-            }
-            //Else we have found a distinct sample
-            else{
-              //Return the sample
-              return jsPsych.randomization.shuffle(sample);
-            }//End of inner if-else
-            
-          }//End of outer if-else (if n === 1)
-          
-        }//End of sampleFrom
-        */
+        
         //Function to make the image html tag
         function makeImageHTML(path){
           
