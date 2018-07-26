@@ -34,6 +34,10 @@ function output = calculateDPrime(dataStructure)
     hitRate_HighPE = nHits_HighPE/nTN_HighPE;
     FARate_HighPE = nFAs_HighPE/nNT_HighPE;
     
+    % Correct the rates if necessary
+    hitRate_HighPE = rateCorrection(hitRate_HighPE, nTN_HighPE);
+    FARate_HighPE = rateCorrection(FARate_HighPE, nNT_HighPE);
+    
     % Calculate z-score of high PE Hits and FAs
     hits_HighPE_zScore = norminv(hitRate_HighPE);
     FAs_HighPE_zScore = norminv(FARate_HighPE);
@@ -74,6 +78,10 @@ function output = calculateDPrime(dataStructure)
     % Hit Rate for Low PE
     hitRate_LowPE = nHits_LowPE/nTN_LowPE;
     FARate_LowPE = nFAs_LowPE/nNT_LowPE;
+    
+    % Correct the rates if necessary
+    hitRate_LowPE = rateCorrection(hitRate_LowPE, nTN_LowPE);
+    FARate_LowPE = rateCorrection(FARate_LowPE, nNT_LowPE);
     
     % Calculate z-score of high PE Hits and FAs
     hits_LowPE_zScore = norminv(hitRate_LowPE);
