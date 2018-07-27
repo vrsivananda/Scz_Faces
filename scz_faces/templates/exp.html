@@ -85,7 +85,7 @@
         nTrials3AFC = 208; //Must be multiple of 8 for counterbalancing gender, PE & norm
         nFacesPerGender = 10; //How many faces to keep from each gender for the AFC trials
         lowPECutoff = 0.5;
-        highPECutoff  = 0;
+        highPECutoff = 0;
         
         
         //Global variables to be filled in by functions below
@@ -942,12 +942,11 @@
         
         //Function to sample a number of face objects from a PEArray and checks their z-score are all different
         function sampleFrom(){
+        	
+          //---- Get the samples ----
           
           //Declare an array to hold the samples
           var sample = [];
-          
-          //Declare an array to hold the z-scores
-          var zScores = [];
           
           //For loop that goes through the pairs of arguments
           //First element is relevantArray, second element is the number to sample
@@ -971,6 +970,11 @@
             sample = sample.concat(currentSample);
           }
           
+          //---- Check the zScores ----
+          
+          //Declare an array to hold the z-scores
+          var zScores = [];
+          
           //For loop that goes through the samples array to get their zScores
           for(var i = 0; i < sample.length; i++){
             //Push the zScores of the sample into the zScore array
@@ -980,10 +984,18 @@
           //Create an array of unique zscores
           uniqueZScores = [...new Set(zScores)];
           
-          //Get the unique zScores and check if it's the same length as the zScores
-          //Make sure that all 3 faces are also not within the 3 PE cutoffs
-          if( (uniqueZScores.length === zScores.length) && (!allValuesBetweenCutoffs(uniqueZScores)) ){
-            return sample;
+          //Checks:
+          //(1) Check if the unique zScores are the same length as the zScores
+          //(2) Make sure that all 3 faces are also not within the 3 PE cutoffs
+          //(3.1) If we have 4 arguments, then the target ZScore is larger than the lowPE cutoff, or
+          //(3.2) if we have 2 arguments, then we just return it if it meets critiria (1) and (2) above
+          if( (uniqueZScores.length === zScores.length) && 
+          	  (!allValuesBetweenCutoffs(uniqueZScores) ) &&
+          	  ( (arguments.length === 4 && Math.max(...uniqueZScores) > lowPECutoff) || arguments.length === 2) ){
+            	
+            	//Return the sample is all conditions are met
+            	return sample;
+          	
           }
           //Else we recursively resample according to the length of the argument
           else{
@@ -1149,20 +1161,20 @@
           //If all  faces are above the highPE cutoff, then they are highPE
           //(Trials with all 3 faces between the low and highPE cutoffs are considered highPE)
           //HighPE High Norm
-          if(triplet[0].zScore > highPECutoff && triplet[1].zScore > highPECutoff && triplet[2].zScore > highPECutoff){
+          if(triplet[0].zScore >= lowPECutoff && triplet[1].zScore >= highPECutoff && triplet[2].zScore >= highPECutoff){
             var PE = "high";
           }
           //HighPE Low Norm
-          else if(triplet[0].zScore > highPECutoff && triplet[1].zScore > highPECutoff && triplet[2].zScore < lowPECutoff){
+          else if(triplet[0].zScore >= lowPECutoff && triplet[1].zScore >= highPECutoff && triplet[2].zScore <= highPECutoff){
             var PE = "high";
           }
           //Low PE both High and Low Norm
-          else if(triplet[0].zScore < lowPECutoff && triplet[1].zScore < lowPECutoff && triplet[2].zScore < lowPECutoff){
+          else if(triplet[0].zScore <= lowPECutoff && triplet[1].zScore <= lowPECutoff && triplet[2].zScore <= lowPECutoff){
             var PE = "low";
           }
           //Else we have a problem
           else{
-            alert("Problem with determining PE.");
+            console.log("Problem with determining PE.");
           }
           
           //Shuffle the triplet to randomize the faces

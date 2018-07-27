@@ -40,7 +40,6 @@ function [dataStructure, nLowPE, nHighPE] = categorizePE(dataStructure, lowPECut
         
         
         % Degubbing
-        close all;
         if(    targetZScore <= lowPECutoff &&     targetZScore >= highPECutoff && ...
             nonTargetZScore <= lowPECutoff &&  nonTargetZScore >= highPECutoff && ...
            distractorZScore <= lowPECutoff && distractorZScore >= highPECutoff)
@@ -48,8 +47,6 @@ function [dataStructure, nLowPE, nHighPE] = categorizePE(dataStructure, lowPECut
         end
         
         if(targetZScore <= nonTargetZScore || targetZScore <= distractorZScore)
-            disp(i);
-        end
 
         
         % Set the PE based on the z-score
@@ -80,12 +77,11 @@ function [dataStructure, nLowPE, nHighPE] = categorizePE(dataStructure, lowPECut
         
     end % End of for loop
     
-    
     nHighPE = length(returnIndices(dataStructure.PE, 'high'));
     nLowPE = length(returnIndices(dataStructure.PE, 'low'));
     
-     disp(hh);
-     disp(hl);
-     disp(l);
+    disp(hh);
+    disp(hl);
+    disp(l);
     
 end % End of function

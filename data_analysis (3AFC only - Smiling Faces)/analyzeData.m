@@ -22,7 +22,7 @@ lowPECutoff = 0.5;
 
 % Create a path to the text file with all the subjects
 subjectOrPatient = 'subject';
-path=[subjectOrPatient 's_Round1.txt'];
+path=[subjectOrPatient 's_Testing.txt'];
 % Make an ID for the subject list file
 subjectListFileId=fopen(path);
 % Read in the number from the subject list
