@@ -1,0 +1,65 @@
+function plotChosenDistractor(chosenDistractor_All, subjectOrPatient, saveFigure)    
+    
+    
+    % ----------- Individual Plots -----------
+    
+    % Parameters
+    yLimits = [0, 1];
+    
+    % New Figure
+    figure;
+    
+    % Get the number of subjects
+    nSubjects = size(chosenDistractor_All, 1);
+    
+    % For loop to go through each subject's data
+    for i = 1:nSubjects
+        
+        % ---- Extract Data ----
+        
+        % Get the current subject's data structure
+        current_percentChosenDistractor_HighPE = chosenDistractor_All(i,2);
+        current_percentChosenDistractor_LowPE  = chosenDistractor_All(i,4);
+        
+        % ---- Make Plot ----
+        
+        % Calculate the X for the current subject
+        current_X = i/(nSubjects+1);
+        
+        % Vertical line
+        plot([current_X, current_X], yLimits, '-', 'Color', [0.5, 0.5, 0.5]);
+        hold on;
+        
+        % -Male-
+        
+        % Make the y-array
+        current_Y_Array = [current_percentChosenDistractor_HighPE, current_percentChosenDistractor_LowPE];
+        
+        % Plot the lines
+        plot([current_X, current_X], current_Y_Array);
+        hold on;
+        
+    end % End of for loop
+    
+    % Plot the horizontal line at 0.333
+    plot([0, 0], [0, 1], '-m');
+    
+    ylabel('% chose distractor');
+    xlabel('subjects');
+
+
+    % ------ Saving ------
+
+    % Only save the figure if we want to
+    if(saveFigure)
+
+        % Create the file name and path to save
+        savingFileName = ['overall_zScoreDistribution_' subjectOrPatient 's_.jpg'];
+        savingFilePath = [pwd '/Figures/Overall_' subjectOrPatient 's/' savingFileName];
+
+        % Save the data
+        saveas(gcf,savingFilePath);
+
+    end
+    
+end % End of function

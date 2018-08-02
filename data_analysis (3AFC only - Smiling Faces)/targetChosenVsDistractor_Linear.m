@@ -19,8 +19,8 @@ function output = targetChosenVsDistractor_Linear(dataStructure, PE)
     end % End of if nargin
     
     % Define the arrays to store data
-    chosenTarget_array = [];
-    distractorZScore_array = [];
+    chosenTarget_array = []; % Gets filled with 1s for every target chosen, 0s for every non-target chosen
+    distractorZScore_array = []; % z-scores of distractors that correspond to each element in chosenTarget_array
     
     % Define counter to count distractors
     distractorCounter = 0;
@@ -36,7 +36,7 @@ function output = targetChosenVsDistractor_Linear(dataStructure, PE)
             % Log in the zScore for the distractor
             distractorZScore_array(length(distractorZScore_array)+1,1) = dataStructure.distractorZScore(i);
         
-            % Else if they chose the non-target
+        % Else if they chose the non-target
         elseif(strcmp(dataStructure.chosenFace(i), 'non-target'))
             
             % Fill in the array with a 0
@@ -44,7 +44,7 @@ function output = targetChosenVsDistractor_Linear(dataStructure, PE)
             % Log in the zScore for the distractor
             distractorZScore_array(length(distractorZScore_array)+1,1) = dataStructure.distractorZScore(i);
         
-            % Else if they chose the distractor
+        % Else if they chose the distractor
         elseif(strcmp(dataStructure.chosenFace(i), 'distractor'))
             
             % Increment the distractor counter

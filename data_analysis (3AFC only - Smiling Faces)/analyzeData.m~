@@ -51,7 +51,6 @@ highPE_3AFC_zScoreDiff_All = [];
 lowPE_3AFC_zScoreDiff_All = [];
 
 dPrimes_All = [];
-chosenDistractor_All = [];
 
 phase1Phase2Performance_All = [];
 
@@ -210,9 +209,8 @@ for i = 1:numberOfSubjects
                     
                     % Calculate the number of trials where the subject
                     % chose the distractor
-                    currentChosenDistractor = calculateChosenDistractor(dataStructure);
-                    % ^ In the form: 
-                    % [nChoseDistractor_HighPE, percentChoseDistractor_HighPE, nChoseDistractor_LowPE,  percentChoseDistractor_LowPE;]
+                    currentChoseDistractor = calculateChoseDistractor(dataStructure);
+                    % ^ In the form: [nChoseDistractor_HighPE, nChoseDistractor_LowPE]
 
                     % Percent chosen target vs distractor
                     current_linRegData_3AFC = targetChosenVsDistractor_Linear(dataStructure);
@@ -251,17 +249,11 @@ for i = 1:numberOfSubjects
                     % Rating Difference
                     ratingDifference(nValidSubjects,:,1) = currentDifference_M;
                     ratingDifference(nValidSubjects,:,2) = currentDifference_F;
-                    
-                    % dPrime
-                    dPrimes_All(size(dPrimes_All,1)+1,:) = currentDPrime;
-                    
-                    % choseDistractor
-                    chosenDistractor_All(size(chosenDistractor_All,1)+1,:) = currentChosenDistractor;
-                    
-                    % AFC_Confidence
+
+                    dPrimes_All(size(dPrimes_All(),1)+1,:) = currentDPrime;
+
                     AFC3_Confidence_All(size(AFC3_Confidence_All,1)+1,:) = [confidenceAndZScore(1),confidenceAndZScore(2)];
-                    
-                    % zScoreDiff_All
+
                     highPE_3AFC_zScoreDiff_All(length(highPE_3AFC_zScoreDiff_All)+1,1) = confidenceAndZScore(2);
                     lowPE_3AFC_zScoreDiff_All(length(lowPE_3AFC_zScoreDiff_All)+1,1)  = confidenceAndZScore(3);
 
@@ -323,9 +315,6 @@ subjectColors = rand(nValidSubjects,3);
 
 % Analyze the d's
 analyzeAndPlotDPrimes(dPrimes_All, subjectOrPatient, saveFigure);
-
-% Plot the % chosenDistractors
-plotChosenDistractor(chosenDistractor_All, subjectOrPatient, saveFigure);
 
 % Analyze the confidences
 analyzeAndPlotConfidence(AFC3_Confidence_All, subjectOrPatient, saveFigure);
