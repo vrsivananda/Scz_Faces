@@ -6,7 +6,7 @@ close all;
 % ----- PARAMETERS -----
 
 % Save ALL the figures
-saveFigure = 0;
+saveFigure = 1;
 
 % Create the bins
 bins = [0, 0.1, 0.2, 0.4, 0.8, 1.6, 3.5];
@@ -222,7 +222,8 @@ for i = 1:numberOfSubjects
                     % x, X, y, b, yReg
 
                     % Fit the psychometric functions
-                    [currentParamsValues_AFC_PE, currentBinCounter_AFC_PE, currentExitFlags_AFC_PE, currentPDevs_AFC_PE, currentConverged_AFC_PE]= fitAllPFs(dataStructure, bins, nValidSubjects, subjectOrPatient, saveFigure);
+                    [currentParamsValues_AFC_PE, currentBinCounter_AFC_PE, currentExitFlags_AFC_PE, currentPDevs_AFC_PE, currentConverged_AFC_PE]...
+                        = fitAllPFs(dataStructure, bins, nValidSubjects, subjectOrPatient, saveFigure);
                     % ^ currentParamsValues in the form:
                     % [       AFC3_paramsValues;
                     %  highPE_3AFC_paramsValues;

@@ -22,7 +22,7 @@ conn = database(databaseName,databaseUsername,databasePassword,'Vendor','MySQL',
 
 
 % Load a text file that lists all of the subjects.
-path='subjects_Testing.txt';
+path='subjects_Round1.txt';
 % Make an ID for the subject list file
 subjectListFileId=fopen(path);
 % Read in the number from the subject list

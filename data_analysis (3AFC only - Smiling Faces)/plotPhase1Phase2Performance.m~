@@ -48,7 +48,7 @@ function plotPhase1Phase2Performance(phase1Phase2Performance_All, minPercentCorr
     ylim([0, 1]);
     xlabel('mean difference between face ratings');
     ylabel('percent correct in phase 2');    
-    lgd = legend('Threshold','Chance','Same subject', 'High PE', 'Low PE');
+    lgd = legend('threshold','same subject', 'High PE', 'Low PE');
     lgd.Location = 'southeast';
 
 

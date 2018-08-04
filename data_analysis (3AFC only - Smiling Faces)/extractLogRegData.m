@@ -1,9 +1,11 @@
 function currentSubjectLogRegData = extractLogRegData(dataStructure)
     
     % Get the indices of 3AFC trials where subjects chose the target
-    AFC3_choseTarget_indices = returnIndicesIntersect(dataStructure.trialType,'3AFC', dataStructure.chosenFace, 'target');
+    AFC3_choseTarget_indices = returnIndicesIntersect(dataStructure.trialType,'3AFC',...
+                                                      dataStructure.chosenFace, 'target');
     % Get the indices of 3AFC and where the subject chose the non-target
-    AFC3_choseNonTarget_indices = returnIndicesIntersect(dataStructure.trialType,'3AFC', dataStructure.chosenFace, 'non-target');
+    AFC3_choseNonTarget_indices = returnIndicesIntersect(dataStructure.trialType,'3AFC',...
+                                                         dataStructure.chosenFace, 'non-target');
     
     % Combine and sort them
     AFC3_choseTargetNonTarget_indices = sort([AFC3_choseTarget_indices; AFC3_choseNonTarget_indices]);

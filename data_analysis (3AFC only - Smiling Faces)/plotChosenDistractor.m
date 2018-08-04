@@ -26,30 +26,17 @@ function plotChosenDistractor(chosenDistractor_All, subjectOrPatient, saveFigure
         % Calculate the X for the current subject
         current_X = i;
         
-        % Vertical line
-        %plot([current_X, current_X], yLimits, '-', 'Color', [0.5, 0.5, 0.5]);
-        %hold on;
-        
-        % -Male-
-        
-        % Make the y-array
-        current_Y_Array = [current_percentChosenDistractor_HighPE, current_percentChosenDistractor_LowPE];
-        
         % Connect the dots
         hold on;
-        plot([current_X, current_X], [current_percentChosenDistractor_HighPE, current_percentChosenDistractor_LowPE]);
+        plot([current_X, current_X], [current_percentChosenDistractor_HighPE, current_percentChosenDistractor_LowPE], 'LineWidth', 2, 'Color', [0.5, 0.5, 0.5]);
         
         % High PE
-        scatter(current_X, current_percentChosenDistractor_HighPE, 10, 'green', 'filled');
+        scatter(current_X, current_percentChosenDistractor_HighPE, 50, 'green', 'filled');
         hold on;
+        
         % Low PE
-        scatter(current_X, current_percentChosenDistractor_LowPE, 10, 'red', 'filled');
+        scatter(current_X, current_percentChosenDistractor_LowPE, 50, 'red', 'filled');
         hold on;
-        
-        % Connect the dots
-        hold on;
-        plot([current_X, current_X], [current_percentChosenDistractor_HighPE, current_percentChosenDistractor_LowPE]);
-        
     end % End of for loop
     
     % Plot the horizontal line at 0.333
@@ -59,9 +46,6 @@ function plotChosenDistractor(chosenDistractor_All, subjectOrPatient, saveFigure
     xlabel('subjects');
     ylim(yLimits);
     xticks(0:i+1);
-    
-    % --- Legend for scatter plot ---
-    
     legend('same subject', 'High PE', 'Low PE');
 
 

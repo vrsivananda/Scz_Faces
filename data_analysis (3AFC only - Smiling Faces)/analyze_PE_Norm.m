@@ -146,7 +146,7 @@ function analyze_PE_Norm(chosenFaces_PE_Norm_All, subjectOrPatient, saveFigure)
     
         % Create the file name and path to save
         savingFileName = ['overall_PEVsNorm_Confidence_(n=' num2str(length(highPE_highNorm_confidence)) ').jpg'];
-        savingFilePath = [pwd '/Figures/' savingFileName];
+        savingFilePath = [pwd '/Figures/Overall_' subjectOrPatient 's/' savingFileName];
 
         % Save the data
         saveas(gcf,savingFilePath);

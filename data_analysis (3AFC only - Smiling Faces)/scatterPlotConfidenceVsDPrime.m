@@ -1,4 +1,4 @@
-function scatterPlotConfidenceVsDPrime(dPrimes_All,AFC2_Confidence_All, subjectOrPatient, saveFigure)
+function scatterPlotConfidenceVsDPrime(dPrimes_All,AFC3_Confidence_All, subjectOrPatient, saveFigure)
     % --- Load in variables for easy handling ---
     
     % d'
@@ -6,35 +6,41 @@ function scatterPlotConfidenceVsDPrime(dPrimes_All,AFC2_Confidence_All, subjectO
     lowPE_dPrimes = dPrimes_All(:,2);
     
     % confidence
-    highPE_Confidence = AFC2_Confidence_All(:,1);
-    lowPE_Confidence = AFC2_Confidence_All(:,2);
+    highPE_Confidence = AFC3_Confidence_All(:,1);
+    lowPE_Confidence = AFC3_Confidence_All(:,2);
     
     % --- Make the scatter plot ---
     
     % Make a new plot
     figure;
-    % High PE
-    scatter(highPE_dPrimes, highPE_Confidence, 'filled');
+        
+    % Number of subjects
+    nSubjects = size(highPE_dPrimes,1);
     
-    % Plot on the same plot
-    hold on;
-    % Low PE
-    scatter(lowPE_dPrimes, lowPE_Confidence, 'filled');
+    % For loop that loops through all the subjects
+    for i = 1:nSubjects
+        
+         % ---- Make Plot ----
+        
+        % Connect the dots
+        hold on;
+        plot([highPE_dPrimes(i), lowPE_dPrimes(i)], [highPE_Confidence(i), lowPE_Confidence(i)], 'LineWidth', 2, 'Color', [0.5, 0.5, 0.5]);
+        
+        % High PE
+        scatter(highPE_dPrimes(i), highPE_Confidence(i), 50, 'green', 'filled');
+        hold on;
+        
+        % Low PE
+        scatter(lowPE_dPrimes(i), lowPE_Confidence(i), 50, 'red', 'filled');
+        hold on;
+        
+    end % End of for loop
     
     % --- Legend for scatter plot ---
     
-    legend('High PE', 'Low PE');
+    legend('Same Subject', 'High PE', 'Low PE');
     
-    % --- Connect the dots ---
-    
-    % For loop that goes through everyone
-    for i = 1:size(dPrimes_All,1)
-        
-        hold on;
-        plot([highPE_dPrimes(i), lowPE_dPrimes(i)], [highPE_Confidence(i), lowPE_Confidence(i)]);
-        
-    end
-    
+
     % --- Formatting ---
     xlabel('dPrime');
     ylabel('Confidence');

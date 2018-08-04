@@ -21,7 +21,7 @@ function plotZScoreDistribution(zScore_Distribution_M, zScore_Distribution_F, su
         % ---- Make Plot ----
         
         % Calculate the Y for the current subject
-        current_Y = i/(nSubjects+1);
+        current_Y = i;
         
         % Horizontal line
         plot([-3, 3], [current_Y, current_Y], '-', 'Color', [0.5, 0.5, 0.5]);
@@ -34,7 +34,6 @@ function plotZScoreDistribution(zScore_Distribution_M, zScore_Distribution_F, su
         
         % Plot the circles
         plot(current_M_zScores, current_Y_Array, 'ob', 'MarkerFaceColor', 'b');
-        ylim([0, 1]);
         hold on;
         
         % -Female-
@@ -44,16 +43,17 @@ function plotZScoreDistribution(zScore_Distribution_M, zScore_Distribution_F, su
         
         % Plot the circles
         plot(current_F_zScores, current_Y_Array, 'or', 'MarkerFaceColor', 'r');
-        ylim([0, 1]);
         hold on;
         
     end % End of for loop
     
     % Plot the vertical line at 0
-    plot([0, 0], [0, 1], '-m');
+    plot([0, 0], [0, i+1], '-m');
+    ylim([0, i+1]);
+    yticks(0:i+1);
     
     xlabel('z-score');
-    ylabel('subjects');
+    ylabel('subject');
 
 
     % ------ Saving ------

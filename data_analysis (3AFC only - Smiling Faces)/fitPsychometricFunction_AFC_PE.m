@@ -200,7 +200,7 @@ function [paramsValues, percentChosenTarget, binCounter, binCenter, exitflag, pD
         % ---- Bin the data dynamically into 4 bins ----(13 per bin if 52 trials)
 
         % The number per bin 
-        nPerBin = length(zScoreDiffs_sorted)/4;
+        nPerBin = length(zScoreDiffs_sorted)/4; % Unused
         
         % Get the index of the first positive number
         halfwayIndex = find(zScoreDiffs_sorted > 0, 1);
