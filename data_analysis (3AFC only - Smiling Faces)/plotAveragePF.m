@@ -1,4 +1,4 @@
-function plotAveragePF(paramsValues_All, paramsValues_Norm_All, subjectOrPatient, saveFigure)
+function plotAveragePF(paramsValues_AFC_PE_All, paramsValues_Norm_All, subjectOrPatient, saveFigure)
     
     % ========== PARAMETERS BEGIN ==========
     
@@ -32,7 +32,7 @@ function plotAveragePF(paramsValues_All, paramsValues_Norm_All, subjectOrPatient
     % ========== PARAMETERS END ==========
     
     % The number of subjects
-    nSubjects = size(paramsValues_All,3);
+    nSubjects = size(paramsValues_AFC_PE_All,3);
     
     % Get the fine-grained x-axis values
     stimLevelsFine = xMin:(xMax-xMin)/1000:xMax;
@@ -53,10 +53,10 @@ function plotAveragePF(paramsValues_All, paramsValues_Norm_All, subjectOrPatient
         % ******************** AFC ********************
 
         % 3AFC
-        AFC3_alpha_mean = mean(paramsValues_All(1,alphaIndex,:));
-        AFC3_beta_mean = mean(paramsValues_All(1,betaIndex,:));
-        AFC3_gamma_mean = mean(paramsValues_All(1,gammaIndex,:));
-        AFC3_lambda_mean = mean(paramsValues_All(1,lambdaIndex,:));
+        AFC3_alpha_mean = mean(paramsValues_AFC_PE_All(1,alphaIndex,:));
+        AFC3_beta_mean = mean(paramsValues_AFC_PE_All(1,betaIndex,:));
+        AFC3_gamma_mean = mean(paramsValues_AFC_PE_All(1,gammaIndex,:));
+        AFC3_lambda_mean = mean(paramsValues_AFC_PE_All(1,lambdaIndex,:));
 
         % Get the fit for the different conditions
         AFC3_fit =  PF([AFC3_alpha_mean, AFC3_beta_mean, AFC3_gamma_mean, AFC3_lambda_mean],stimLevelsFine);
@@ -96,16 +96,18 @@ function plotAveragePF(paramsValues_All, paramsValues_Norm_All, subjectOrPatient
         % ******************** PE & AFC Plot ********************
 
         % 3AFC && highPE
-        highPE_3AFC_alpha_mean  = mean(paramsValues_All(2,alphaIndex,:));
-        highPE_3AFC_beta_mean   = mean(paramsValues_All(2,betaIndex,:));
-        highPE_3AFC_gamma_mean  = mean(paramsValues_All(2,gammaIndex,:));
-        highPE_3AFC_lambda_mean = mean(paramsValues_All(2,lambdaIndex,:));
+        highPE_3AFC_alpha_mean  = mean(paramsValues_AFC_PE_All(2,alphaIndex,:));
+        highPE_3AFC_beta_mean   = mean(paramsValues_AFC_PE_All(2,betaIndex,:));
+        highPE_3AFC_gamma_mean  = mean(paramsValues_AFC_PE_All(2,gammaIndex,:));
+        highPE_3AFC_lambda_mean = mean(paramsValues_AFC_PE_All(2,lambdaIndex,:));
+        disp(['highPE beta:' num2str(highPE_3AFC_beta_mean)]);
 
         % 3AFC && lowPE
-        lowPE_3AFC_alpha_mean  = mean(paramsValues_All(3,alphaIndex,:));
-        lowPE_3AFC_beta_mean   = mean(paramsValues_All(3,betaIndex,:));
-        lowPE_3AFC_gamma_mean  = mean(paramsValues_All(3,gammaIndex,:));
-        lowPE_3AFC_lambda_mean = mean(paramsValues_All(3,lambdaIndex,:));
+        lowPE_3AFC_alpha_mean  = mean(paramsValues_AFC_PE_All(3,alphaIndex,:));
+        lowPE_3AFC_beta_mean   = mean(paramsValues_AFC_PE_All(3,betaIndex,:));
+        lowPE_3AFC_gamma_mean  = mean(paramsValues_AFC_PE_All(3,gammaIndex,:));
+        lowPE_3AFC_lambda_mean = mean(paramsValues_AFC_PE_All(3,lambdaIndex,:));
+        disp(['lowPE beta:' num2str(lowPE_3AFC_beta_mean)]);
 
 
         % Get the fit for the different conditions
@@ -221,7 +223,7 @@ function plotAveragePF(paramsValues_All, paramsValues_Norm_All, subjectOrPatient
 
         % For loop that creates the y-values
         for i = 1:nSubjects
-            AFC3_y(i,:) = PF([paramsValues_All(1,1,i), paramsValues_All(1,2,i), paramsValues_All(1,3,i), paramsValues_All(1,4,i)],stimLevelsFine);
+            AFC3_y(i,:) = PF([paramsValues_AFC_PE_All(1,1,i), paramsValues_AFC_PE_All(1,2,i), paramsValues_AFC_PE_All(1,3,i), paramsValues_AFC_PE_All(1,4,i)],stimLevelsFine);
 
         end % End of for loop
 
@@ -261,8 +263,8 @@ function plotAveragePF(paramsValues_All, paramsValues_Norm_All, subjectOrPatient
 
         % For loop that creates the y-values
         for i = 1:nSubjects
-            highPE_3AFC_y(i,:) = PF([paramsValues_All(2,1,i), paramsValues_All(2,2,i), paramsValues_All(2,3,i), paramsValues_All(2,4,i)],stimLevelsFine);
-            lowPE_3AFC_y(i,:)  = PF([paramsValues_All(3,1,i), paramsValues_All(3,2,i), paramsValues_All(3,3,i), paramsValues_All(3,4,i)],stimLevelsFine);
+            highPE_3AFC_y(i,:) = PF([paramsValues_AFC_PE_All(2,1,i), paramsValues_AFC_PE_All(2,2,i), paramsValues_AFC_PE_All(2,3,i), paramsValues_AFC_PE_All(2,4,i)],stimLevelsFine);
+            lowPE_3AFC_y(i,:)  = PF([paramsValues_AFC_PE_All(3,1,i), paramsValues_AFC_PE_All(3,2,i), paramsValues_AFC_PE_All(3,3,i), paramsValues_AFC_PE_All(3,4,i)],stimLevelsFine);
         end % End of for loop
 
         % Plot the graph

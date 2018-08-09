@@ -6,7 +6,7 @@ close all;
 % ----- PARAMETERS -----
 
 % Save ALL the figures
-saveFigure = 1;
+saveFigure = 0;
 
 % Create the bins
 bins = [0, 0.1, 0.2, 0.4, 0.8, 1.6, 3.5];
