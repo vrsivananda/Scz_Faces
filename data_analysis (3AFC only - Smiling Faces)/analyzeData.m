@@ -176,7 +176,7 @@ for i = 1:numberOfSubjects
 
                 % Gatekeeper #4: Make sure the subjects get any of those 
                 % below a certain percent correct
-                if (pCorrect_3AFC_lowPE  < minPercentCorrect || ...
+                if (pCorrect_3AFC_lowPE  < minPercentCorrect && ...
                     pCorrect_3AFC_highPE < minPercentCorrect)
 
                     % Increment the counter
@@ -246,6 +246,10 @@ for i = 1:numberOfSubjects
                     % ^ Data Structure with 2 fields: 
                     % (1) M_zScores and
                     % (2) F_zScores
+                    
+                    % Fit the psychometric function with attractiveness
+                    % ratings as the x-axis
+                    current_fit_attractivenessRatings_PE = fitPF_attractivenessRatings(dataStructure, nValidSubjects, subjectOrPatient, saveFigure);
                     
                     % ---- Store the data ----
 
@@ -356,6 +360,3 @@ plotPhase1Phase2Performance(phase1Phase2Performance_All, minPercentCorrect, subj
 
 % Plot the distribution of z-scores
 plotZScoreDistribution(zScore_Distribution_M, zScore_Distribution_F, subjectOrPatient, saveFigure);
-
-
-

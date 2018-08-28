@@ -74,7 +74,7 @@ function runLogisticRegression(logReg_3AFC, subjectOrPatient, saveFigure)
     if(saveFigure)
     
         % Create the file name and path to save
-        savingFileName = ['overall_LogisticRegression_zNonTarget-zDistractor' subjectOrPatient 's_.jpg'];
+        savingFileName = ['overall_LogisticRegression_zNonTarget-zDistractor_' subjectOrPatient 's_.jpg'];
         savingFilePath = [pwd '/Figures/Overall_' subjectOrPatient 's/' savingFileName];
 
         % Save the data
@@ -154,7 +154,7 @@ function runLogisticRegression(logReg_3AFC, subjectOrPatient, saveFigure)
     if(saveFigure)
     
         % Create the file name and path to save
-        savingFileName = ['overall_LogisticRegression_zDistractor' subjectOrPatient 's_.jpg'];
+        savingFileName = ['overall_LogisticRegression_zDistractor_' subjectOrPatient 's_.jpg'];
         savingFilePath = [pwd '/Figures/Overall_' subjectOrPatient 's/' savingFileName];
 
         % Save the data

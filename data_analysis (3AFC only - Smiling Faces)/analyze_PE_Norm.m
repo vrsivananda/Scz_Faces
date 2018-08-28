@@ -106,7 +106,7 @@ function analyze_PE_Norm(chosenFaces_PE_Norm_All, subjectOrPatient, saveFigure)
     lowPE_lowNorm_confidence = chosenFaces_PE_Norm_All(4,4,:);
     
     % t-test for HPE: lowNorm vs highNorm
-    disp('t-test for lowPE_highNorm_confidence vs lowPE_confidence:');
+    disp('t-test for lowPE_highNorm_confidence vs lowPE_lowNorm_confidence:');
     [H,P,CI,STATS] = ttest(lowPE_highNorm_confidence, lowPE_lowNorm_confidence)
     
     % -------- Plot the graph --------
