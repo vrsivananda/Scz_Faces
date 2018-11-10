@@ -18,6 +18,9 @@ minPercentCorrect = 0.45;
 highPECutoff = 0;
 lowPECutoff = 0.5;
 
+% Psychometric function
+PF = @PAL_CumulativeNormal;
+
 % ----- Start reading the file -----
 
 % Create a path to the text file with all the subjects
@@ -223,7 +226,7 @@ for i = 1:numberOfSubjects
 
                     % Fit the psychometric functions
                     [currentParamsValues_AFC_PE, currentBinCounter_AFC_PE, currentExitFlags_AFC_PE, currentPDevs_AFC_PE, currentConverged_AFC_PE]...
-                        = fitAllPFs(dataStructure, bins, nValidSubjects, subjectOrPatient, saveFigure);
+                        = fitAllPFs(dataStructure, bins, PF, nValidSubjects, subjectOrPatient, saveFigure);
                     % ^ currentParamsValues in the form:
                     % [       AFC3_paramsValues;
                     %  highPE_3AFC_paramsValues;
@@ -249,7 +252,7 @@ for i = 1:numberOfSubjects
                     
                     % Fit the psychometric function with attractiveness
                     % ratings as the x-axis
-                    current_fit_attractivenessRatings_PE = fitPF_attractivenessRatings(dataStructure, nValidSubjects, subjectOrPatient, saveFigure);
+                    current_fit_attractivenessRatings_PE = fitPF_attractivenessRatings(dataStructure, nValidSubjects, PF, subjectOrPatient, saveFigure);
                     
                     % ---- Store the data ----
 

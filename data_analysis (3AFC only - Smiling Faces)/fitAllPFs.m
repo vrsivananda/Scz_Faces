@@ -1,9 +1,6 @@
-function [paramsValues, binCounter, exitFlags, pDevs, converged] = fitAllPFs(dataStructure, bins, subjectNumber, subjectOrPatient, saveFigure)
+function [paramsValues, binCounter, exitFlags, pDevs, converged] = fitAllPFs(dataStructure, bins, PF, subjectNumber, subjectOrPatient, saveFigure)
     
     % ============ PARAMETERS BEGIN ============
-    
-    % Choose the a psychometric function 
-    PF = @PAL_CumulativeNormal;
     
     % General
     marker = '.';

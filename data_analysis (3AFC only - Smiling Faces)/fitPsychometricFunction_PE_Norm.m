@@ -322,8 +322,6 @@ function [paramValues, chosenFaces] = fitPsychometricFunction_PE_Norm(dataStruct
     end % End of for loop i which goes through the dataStructure
     
     
-    disp(['fitPF_NormEffect distractorCounter: ' num2str(distractorCounter)]); %[delete this]
-    
     % =====================================================================
     % ============================   High PE   ============================
     % =====================================================================
